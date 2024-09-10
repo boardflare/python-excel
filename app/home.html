@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Python</title>
+    <base target="_top">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XNNM225DV"></script>
+    <script src="main.js" type="module"></script>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="sidebar branding-below">
+        <div class="block">
+            <div class="block">
+                Runs Python code locally in Excel (web or desktop) and is free for unlimited
+                use. Your feedback is appreciated! 🙏
+            </div>
+            <div class="block">
+                <details>
+                    <summary>Instructions</summary>
+                    Main function is
+                    <code>=BF.PY(code, [inputs])</code>. e.g. <code>=BF.PY("2 + 2")</code>. Your Python code
+                    must end with an expression, variable, or function call that returns a value. See <a target="_blank"
+                        rel=noopener href="https://www.boardflare.com/apps/excel/python">documentation</a> and <a
+                        target="_blank" rel=noopener href="">demo
+                        workbook</a> for details. This is an initial version and is subject to breaking API changes.
+                    Please report any issues in feedback. Thanks!
+                    <p>
+                    <div id="webgpu"></div>
+                    </p>
+                </details>
+                <details>
+                    <summary>Feedback</summary>
+                    <textarea id="feedback" rows="10" placeholder="How was it? 🙂"></textarea>
+                    <input type="email" id="email" placeholder="Email (optional), if you'd like a response">
+                    <button id="submitFeedback" type="button">Submit</button>
+                </details>
+                <details open>
+                    <summary>Progress</summary>
+                    <div class="block progress-container">
+                        <button id="cancelButton" type="button">Cancel</button>
+                        <div id="progress"></div>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar bottom">
+        <div class="footer-container">
+            <span class="gray">
+                <img src="./images/favicon.svg" alt="Boardflare Icon" class="icon">
+                BOARDFLARE
+            </span>
+            <span>
+                🛟<a id="supportLink" target="_blank" rel=noopener
+                    href="https://www.boardflare.com/company/support">Email Support</a>
+            </span>
+        </div>
+    </div>
+    <script src="functions.js" type="module"></script>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+{
+    "allowCustomDataForDataTypeAny": true,
+    "allowErrorForDataTypeAny": true,
+    "functions": [
+        {
+            "id": "PY",
+            "name": "PY",
+            "description": "Executes Python code locally.",
+            "helpUrl": "https://www.boardflare.com/apps/excel/python#py",
+            "parameters": [
+                {
+                    "name": "code",
+                    "description": "Python code",
+                    "type": "string"
+                },
+                {
+                    "name": "inputs",
+                    "description": "Range of global variables code will have access to.",
+                    "optional": true,
+                    "dimensionality": "matrix",
+                    "type": "any"
+                }
+            ],
+            "result": {
+                "dimensionality": "matrix"
+            }
+        }
+    ]
+}

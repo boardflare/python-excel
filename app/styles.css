@@ -1,0 +1,102 @@
+body {
+    background-color: white;
+    font-size: 14px;
+}
+
+.branding-below {
+    bottom: 80px;
+    top: 0;
+}
+
+code {
+    color: darkgreen;
+}
+
+.footer-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.icon {
+    height: 1.25rem;
+    vertical-align: middle;
+}
+
+#accountDetails {
+    display: none;
+}
+
+#cancelButton {
+    margin: 0.5rem;
+}
+
+#credits {
+    font-weight: bold;
+    margin: 0.5rem;
+}
+
+#email {
+    width: 100%;
+}
+
+#fallback-login {
+    display: none;
+    margin: 0.5rem;
+}
+
+#feedback {
+    width: 100%;
+}
+
+#progress {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#referralForm input[type="submit"] {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 10px 15px;
+}
+
+#referralForm input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+#referralForm input[type="text"] {
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+}
+
+#referralForm label {
+    margin-bottom: 5px;
+}
+
+#submitFeedback {
+    margin-top: 5px;
+}
+
+.referral-block {
+    display: none;
+}
+
+.sidebar span {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+summary,
+th,
+td {
+    padding: 3px;
+}
+
+table {
+    border: 1px solid black;
+}
