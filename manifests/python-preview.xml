@@ -8,22 +8,22 @@
 
   <!-- Begin Basic Settings. -->
   <!-- IMPORTANT! Must be unique for your add-in -->
-  <Id>985345eb-9c8a-4a28-9c19-1f5f995312b3</Id>
+  <Id>bb0a536a-6810-4368-bed2-56332ac48571</Id>
 
   <!--Version.
   Updates from the store only get triggered if there is a version change. -->
-  <Version>1.0.0.3</Version>
+  <Version>1.0.0.0</Version>
   <ProviderName>Boardflare</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
 
   <!-- The display name of your add-in. Used on the store and various places of the Office UI such
   as the add-ins dialog. -->
-  <DisplayName DefaultValue="FreeGPT for Excel" />
-  <Description DefaultValue="Unlimited free AI running locally in Excel." />
+  <DisplayName DefaultValue="Python for Excel" />
+  <Description DefaultValue="Run Python code locally in Excel for free." />
   <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
-  <IconUrl DefaultValue="https://addins.boardflare.com/freegpt/preview/images/icon-32.png" />
+  <IconUrl DefaultValue="https://addins.boardflare.com/python/preview/images/icon-32.png" />
   <HighResolutionIconUrl
-    DefaultValue="https://addins.boardflare.com/freegpt/preview/images/icon-64.png" />
+    DefaultValue="https://addins.boardflare.com/python/preview/images/icon-64.png" />
   <SupportUrl DefaultValue="https://www.boardflare.com/company/support" />
 
   <!-- Domains here can be navigated to within task pane. -->
@@ -48,7 +48,7 @@
     </Sets>
   </Requirements>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://addins.boardflare.com/freegpt/preview/home.html" />
+    <SourceLocation DefaultValue="https://addins.boardflare.com/python/preview/home.html" />
   </DefaultSettings>
   <!-- End TaskPane Mode integration.  -->
 
@@ -157,33 +157,33 @@
     <Resources>
       <bt:Images>
         <bt:Image id="BF.tpicon_16x16"
-          DefaultValue="https://addins.boardflare.com/freegpt/preview/images/icon-16.png" />
+          DefaultValue="https://addins.boardflare.com/python/preview/images/icon-16.png" />
         <bt:Image id="BF.tpicon_32x32"
-          DefaultValue="https://addins.boardflare.com/freegpt/preview/images/icon-32.png" />
+          DefaultValue="https://addins.boardflare.com/python/preview/images/icon-32.png" />
         <bt:Image id="BF.tpicon_80x80"
-          DefaultValue="https://addins.boardflare.com/freegpt/preview/images/icon-80.png" />
+          DefaultValue="https://addins.boardflare.com/python/preview/images/icon-80.png" />
       </bt:Images>
       <bt:Urls>
         <bt:Url id="BF.CustomFunctions.Script"
-          DefaultValue="https://addins.boardflare.com/freegpt/preview/functions.js" />
+          DefaultValue="https://addins.boardflare.com/python/preview/functions.js" />
         <bt:Url id="BF.CustomFunctions.Json"
-          DefaultValue="https://addins.boardflare.com/freegpt/preview/functions.json" />
+          DefaultValue="https://addins.boardflare.com/python/preview/functions.json" />
         <bt:Url id="BF.SharedRuntime.Url"
-          DefaultValue="https://addins.boardflare.com/freegpt/preview/home.html" />
+          DefaultValue="https://addins.boardflare.com/python/preview/home.html" />
         <bt:Url id="BF.GetStarted.LearnMoreUrl" DefaultValue="https://www.boardflare.com" />
       </bt:Urls>
       <!-- ShortStrings max characters==125. -->
       <bt:ShortStrings>
-        <bt:String id="BF.TaskpaneButton.Label" DefaultValue="FreeGPT" />
+        <bt:String id="BF.TaskpaneButton.Label" DefaultValue="Python" />
         <bt:String id="BF.Group1Label" DefaultValue="PREVIEW" />
-        <bt:String id="BF.GetStarted.Title" DefaultValue="FreeGPT for Excel" />
-        <bt:String id="BF.CustomFunctions.NameSpace" DefaultValue="FREEGPT" />
+        <bt:String id="BF.GetStarted.Title" DefaultValue="Python for Excel" />
+        <bt:String id="BF.CustomFunctions.NameSpace" DefaultValue="BOARDFLARE" />
       </bt:ShortStrings>
       <!-- LongStrings max characters==250. -->
       <bt:LongStrings>
         <bt:String id="BF.TaskpaneButton.Tooltip" DefaultValue="Click to open task pane" />
         <bt:String id="BF.GetStarted.Description"
-          DefaultValue="Unlimited free AI running locally in Excel." />
+          DefaultValue="Run Python code locally in Excel for free." />
         <!-- <bt:String id="BF.TestFuncButton.Tooltip" DefaultValue="Test AppCmd button" /> -->
       </bt:LongStrings>
     </Resources>
