@@ -17,30 +17,18 @@
     <div class="sidebar branding-below">
         <div class="block">
             <div class="block">
-                Run Python code locally in Excel for free. Feedback is appreciated! 🙏
+                Run Python code locally in Excel for free.<br> <br>
+                <code>=BOARDFLARE.PY(code, [globals])</code><br> e.g.
+                <code>=BOARDFLARE.PY("x + 2", {"x", 3})</code>.<br>
+                Refer to the <a target="_blank" rel=noopener
+                    href="https://www.boardflare.com/apps/excel/python">documentation</a>
+                and <a target="_blank" rel=noopener
+                    href="https://whistlernetworks.sharepoint.com/:x:/s/Boardflare/EejrDLsCMzBFoY2r-QWdu5MB_6spaJau_Lbu4zWcHg_-HQ?e=9E70aL">demo
+                    workbook</a> for usage details.
             </div>
             <div class="block">
-                <details>
-                    <summary>Instructions</summary>
-                    <code>=BF.PY(code, [inputs])</code><br> e.g. <code>=BF.PY("2 + 2")</code>. See <a target="_blank"
-                        rel=noopener href="https://www.boardflare.com/apps/excel/python">documentation</a> and <a
-                        target="_blank" rel=noopener
-                        href="https://whistlernetworks.sharepoint.com/:x:/s/Boardflare/EejrDLsCMzBFoY2r-QWdu5MB_6spaJau_Lbu4zWcHg_-HQ?e=9E70aL">demo
-                        workbook</a> for details. This initial version is limited in functionality and subject to
-                    breaking changes.
-                    Please report any issues in feedback. Thanks!
-                    <p>
-                    <div id="webgpu"></div>
-                    </p>
-                </details>
-                <details>
-                    <summary>Feedback</summary>
-                    <textarea id="feedback" rows="10" placeholder="How was it? 🙂"></textarea>
-                    <input type="email" id="email" placeholder="Email (optional), if you'd like a response">
-                    <button id="submitFeedback" type="button">Submit</button>
-                </details>
                 <details open>
-                    <summary>Progress</summary>
+                    <summary>Console</summary>
                     <div class="block progress-container">
                         <button id="cancelButton" type="button">Cancel</button>
                         <div id="progress"></div>

@@ -5,7 +5,7 @@ window.appName = 'Python';
 
 // Google Analytics config
 window.appConfig = {
-    app_version: "1.0.0",
+    app_version: "1.0.2",
     content_group: window.appName,
     content_type: "Excel",
 };
@@ -26,11 +26,10 @@ async function initializeBrowserInfo() {
     window.gtag('js', new Date());
     window.gtag('config', 'G-8XNNM225DV', {
         ...window.appConfig,
-        debug_mode: true,
+        //debug_mode: true,
         supportsF16: supportsF16,
         memory: memory,
-        cores: cores,
-        downlink: downlink
+        cores: cores
     });
 
 }
@@ -50,14 +49,5 @@ document.addEventListener('DOMContentLoaded', async function () {
         setTimeout(function () {
             location.reload();
         }, 2000);
-    });
-
-    // submit feedback button
-    const submitFeedbackButton = document.getElementById('submitFeedback');
-    submitFeedbackButton.addEventListener('click', async function () {
-        const feedback = document.getElementById('feedback').value;
-        const email = document.getElementById('email').value;
-        await sendFeedback(window.appName, email, feedback);
-        document.getElementById('progress').innerText = 'Thank you for your feedback!';
     });
 });

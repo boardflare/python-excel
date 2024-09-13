@@ -1,17 +1,45 @@
-import { loadPyodide } from "https://cdn.jsdelivr.net/npm/pyodide@0.26.2/+esm";
+importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js");
 
-let pyodideReadyPromise = (async () => {
+async function loadPyodideAndPackages() {
     self.pyodide = await loadPyodide();
-})();
+    await self.pyodide.loadPackage("micropip");
+    self.micropip = pyodide.pyimport("micropip");
+}
+
+let pyodideReadyPromise = loadPyodideAndPackages();
 
 self.onmessage = async (event) => {
     await pyodideReadyPromise;
-    const { code, inputs } = event.data;
+    const { code, globals } = event.data;
+
+    let stdout = "";
+    let stderr = "";
+
+    // Capture stdout and stderr
+    self.pyodide.setStdout({
+        batched: (msg) => {
+            stdout += msg + "\n";
+        }
+    });
+
+    self.pyodide.setStderr({
+        batched: (msg) => {
+            stderr += msg + "\n";
+        }
+    });
 
     try {
-        // Check if inputs is not null and set the inputs as global variables in the Python environment
-        if (inputs) {
-            inputs.forEach(([key, value]) => {
+        // Find imports in the Python code
+        const imports = self.pyodide.pyodide_py.code.find_imports(code).toJs();
+
+        // Load the imports
+        if (imports && imports.length > 0) {
+            await self.micropip.install(imports);
+        }
+
+        // Check if globals is not null and set the globals as global variables in the Python environment
+        if (globals) {
+            globals.forEach(([key, value]) => {
                 self.pyodide.globals.set(key, value);
             });
         }
@@ -44,10 +72,10 @@ self.onmessage = async (event) => {
             result = [result];
         }
 
-        // Return the result
-        self.postMessage({ result });
+        // Return the result along with stdout and stderr
+        self.postMessage({ result, stdout, stderr });
     } catch (error) {
-        // Return the error
-        self.postMessage({ error: error.message });
+        // Return the error along with stdout and stderr
+        self.postMessage({ error: error.message, stdout, stderr });
     }
 };

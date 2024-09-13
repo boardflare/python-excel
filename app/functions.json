@@ -14,8 +14,8 @@
                     "type": "string"
                 },
                 {
-                    "name": "inputs",
-                    "description": "Range of global variables code will have access to.",
+                    "name": "globals",
+                    "description": "Matrix of global variables code will use, see docs for format.",
                     "optional": true,
                     "dimensionality": "matrix",
                     "type": "any"
