@@ -37,8 +37,11 @@ self.onmessage = async (event) => {
             await self.micropip.install(imports);
         }
 
-        // Check if globals is not null and set the globals as global variables in the Python environment
+        // Check if globals is not null and validate its format
         if (globals) {
+            if (!Array.isArray(globals) || !globals.every(item => Array.isArray(item) && item.length === 2 && typeof item[0] === 'string')) {
+                throw new Error("Globals is not in correct format, see documentation");
+            }
             globals.forEach(([key, value]) => {
                 self.pyodide.globals.set(key, value);
             });
