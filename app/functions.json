@@ -3,10 +3,10 @@
     "allowErrorForDataTypeAny": true,
     "functions": [
         {
-            "id": "PY",
-            "name": "PY",
-            "description": "Executes Python code locally.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python#py",
+            "id": "PY.RUN",
+            "name": "PY.RUN",
+            "description": "Runs Python code locally.",
+            "helpUrl": "https://www.boardflare.com/apps/excel/python#py.run",
             "parameters": [
                 {
                     "name": "code",
@@ -14,10 +14,11 @@
                     "type": "string"
                 },
                 {
-                    "name": "globals",
-                    "description": "Matrix of global variables code will use, see docs for format.",
+                    "name": "data1",
+                    "description": "Data available as global.",
                     "optional": true,
                     "dimensionality": "matrix",
+                    "repeating": true,
                     "type": "any"
                 }
             ],

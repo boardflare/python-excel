@@ -22,9 +22,9 @@ async function messageWorker(worker, message) {
 }
 
 // Function to run Python code using the worker
-async function pythonRun({ code, globals }) {
+async function pythonRun({ code, data1 }) {
     try {
-        const { result, stdout, stderr } = await messageWorker(worker, { code, globals });
+        const { result, stdout, stderr } = await messageWorker(worker, { code, data1 });
         // Write stdout and stderr to the progress div
         document.getElementById('progress').innerText = `${stdout}\n${stderr}`;
         // Emit gtag event
@@ -39,8 +39,8 @@ async function pythonRun({ code, globals }) {
     }
 }
 
-// Export the `py` function to be used in `functions.js`
-export async function py(code, globals) {
-    const args = { code, globals };
+// Export the `pyrun` function to be used in `functions.js`
+export async function pyrun(code, data1) {
+    const args = { code, data1 };
     return await queueTask(args, pythonRun);
 }

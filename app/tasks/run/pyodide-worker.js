@@ -10,7 +10,7 @@ let pyodideReadyPromise = loadPyodideAndPackages();
 
 self.onmessage = async (event) => {
     await pyodideReadyPromise;
-    const { code, globals } = event.data;
+    const { code, data1 } = event.data;
 
     let stdout = "";
     let stderr = "";
@@ -32,48 +32,55 @@ self.onmessage = async (event) => {
         // Find imports in the Python code
         const imports = self.pyodide.pyodide_py.code.find_imports(code).toJs();
 
-        // Load the imports
+        // Load the imports that are not in sys.modules
         if (imports && imports.length > 0) {
-            await self.micropip.install(imports);
+            const sys = self.pyodide.pyimport("sys");
+            const missingImports = imports.filter(pkg => !(pkg in sys.modules.toJs()));
+            if (missingImports.length > 0) {
+                await self.micropip.install(missingImports);
+            }
         }
 
-        // Check if globals is not null and validate its format
-        if (globals) {
-            if (!Array.isArray(globals) || !globals.every(item => Array.isArray(item) && item.length === 2 && typeof item[0] === 'string')) {
-                throw new Error("Globals is not in correct format, see documentation");
-            }
-            globals.forEach(([key, value]) => {
-                self.pyodide.globals.set(key, value);
+        // Set individual globals from data1
+        if (Array.isArray(data1)) {
+            data1.forEach((matrix, index) => {
+                self.pyodide.globals.set(`data${index + 1}`, matrix);
             });
         }
 
         // Execute the Python code
-        let result = await self.pyodide.runPythonAsync(code);
+        await self.pyodide.runPythonAsync(code);
+        let result = self.pyodide.globals.get('result');
 
-        // Handle case where result is null or undefined
+        // Convert nested list to JS array
         if (result === null || result === undefined) {
-            result = "Nothing was returned by your code. Make sure your code ends with an expression, variable, or by calling a function that returns a value.";
+            result = "Result is null or undefined.";
         } else if (result.toJs) {
-            // Convert the result to a native JavaScript object if it has a toJs method
             result = result.toJs();
         }
 
-        // Convert Map to a matrix of key-value pairs if result is a Map
-        if (result instanceof Map) {
-            result = Array.from(result.entries()).map(([key, value]) => {
-                if (typeof value === 'object' && value !== null) {
-                    return [key, JSON.stringify(value)];
-                }
-                return [key, value];
-            });
+        // Check if array is a matrix
+        if (!Array.isArray(result) || !result.every(Array.isArray)) {
+            throw new Error("Result is not a matrix.");
         }
 
-        // Ensure the result is a matrix Excel is expecting
-        if (!Array.isArray(result)) {
-            result = [[result]];
-        } else if (Array.isArray(result) && !Array.isArray(result[0])) {
-            result = [result];
+        // Check if matrix is valid
+        const innerLength = result[0].length;
+        const validTypes = ['number', 'string', 'boolean'];
+
+        const isValidMatrix = result.every(innerArray => {
+            if (innerArray.length !== innerLength) {
+                return false;
+            }
+            return innerArray.every(element => validTypes.includes(typeof element));
+        });
+
+        if (!isValidMatrix) {
+            throw new Error("Result matrix contains invalid elements types or inconsistent row lengths.");
         }
+
+        // Clear globals
+        self.pyodide.globals.clear();
 
         // Return the result along with stdout and stderr
         self.postMessage({ result, stdout, stderr });
