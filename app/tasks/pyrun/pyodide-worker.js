@@ -54,6 +54,13 @@ self.onmessage = async (event) => {
         // Execute the Python code
         await self.pyodide.runPythonAsync(code);
 
+        // Check if pyout is defined
+        const pyoutDefined = self.pyodide.runPython('globals().get("pyout") is not None');
+
+        if (!pyoutDefined) {
+            throw new Error("Breaking change: You need to set a global variable 'pyout' to the value you want to output.");
+        }
+
         const pyoutType = self.pyodide.runPython('type(pyout).__name__');
 
         if (!['list', 'int', 'float', 'str', 'bool'].includes(pyoutType)) {
