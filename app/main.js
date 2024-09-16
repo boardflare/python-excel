@@ -45,9 +45,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.log('Cancel button clicked from taskpane!');
         // Abort ongoing tasks in p-queue
         abortController.abort();
-        // Reloading the page to reset the app.
+        // Reload to reset the app
         setTimeout(function () {
             location.reload();
-        }, 2000);
+        }, 500);
     });
 });

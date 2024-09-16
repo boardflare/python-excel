@@ -45,21 +45,28 @@ self.onmessage = async (event) => {
         if (Array.isArray(data1)) {
             data1.forEach((value, index) => {
                 self.pyodide.globals.set(`data${index + 1}`, value);
+                if (typeof value === 'object') {
+                    self.pyodide.runPython(`data${index + 1} = data${index + 1}.to_py()`);
+                }
             });
         }
 
         // Execute the Python code
         await self.pyodide.runPythonAsync(code);
-        let result = self.pyodide.globals.get('pyout');
 
-        // Convert nested list to JS array
-        if (result === null || result === undefined) {
-            result = "Result is null or undefined.";
-        } else if (result.toJs) {
-            result = result.toJs();
+        const pyoutType = self.pyodide.runPython('type(pyout).__name__');
+
+        if (!['list', 'int', 'float', 'str', 'bool'].includes(pyoutType)) {
+            throw new Error(`pyout must be a list, int, float, str or bool. Found type: ${pyoutType}`);
         }
 
-        // Clear globals
+        const pyout = self.pyodide.globals.get('pyout');
+        let result = pyout;
+        // if pyout is a list, convert it to a JavaScript array
+        if (pyout.toJs) {
+            result = pyout.toJs({ create_proxies: false });
+        }
+
         self.pyodide.globals.clear();
 
         // Return the result along with stdout and stderr

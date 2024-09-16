@@ -4,7 +4,7 @@ import { queueTask } from '../../utils/common.js';
 const validTypes = ['number', 'string', 'boolean'];
 
 // Initialize the Pyodide worker
-let worker = new Worker(new URL('./pyodide-worker.js', import.meta.url));
+let pyworker = new Worker(new URL('./pyodide-worker.js', import.meta.url));
 
 // Function to send messages to the worker and handle responses
 async function messageWorker(worker, message) {
@@ -27,18 +27,18 @@ async function messageWorker(worker, message) {
 // Function to validate the result matrix
 function validateMatrix(result) {
     if (!Array.isArray(result) || !result.every(Array.isArray)) {
-        throw new Error("Result is not a matrix.");
+        throw new Error("pyout is not a matrix.");
     }
 
     const innerLength = result[0].length;
 
     result.forEach(innerArray => {
         if (innerArray.length !== innerLength) {
-            throw new Error("Inconsistent row lengths in the result matrix.");
+            throw new Error("pyout is not a matrix because row lengths are not equal.");
         }
         innerArray.forEach(element => {
             if (!validTypes.includes(typeof element)) {
-                throw new Error("Result matrix contains invalid element types.");
+                throw new Error("pyout matrix must only contain elements of type int, float, str or bool.");
             }
         });
     });
@@ -47,7 +47,7 @@ function validateMatrix(result) {
 // Function to run Python code using the worker
 async function pythonRun({ code, data1, isMatrix }) {
     try {
-        const { result, stdout, stderr } = await messageWorker(worker, { code, data1 });
+        const { result, stdout, stderr } = await messageWorker(pyworker, { code, data1 });
         // Write stdout and stderr to the progress div
         document.getElementById('progress').innerText = `${stdout}\n${stderr}`;
         // Emit gtag event
@@ -58,17 +58,17 @@ async function pythonRun({ code, data1, isMatrix }) {
             validateMatrix(result);
         } else {
             if (!validTypes.includes(typeof result)) {
-                throw new Error("Result is not a valid scalar type.");
+                throw new Error("pyout must be int, float, str or bool.");
             }
         }
 
         return result;
 
-    } catch ({ error, stdout, stderr }) {
-        document.getElementById('progress').innerText = `${stdout}\n${stderr}`;
-        // Emit gtag event
-        window.gtag('event', 'py_err', { error });
-        return isMatrix ? [[`Error: ${error}.`]] : `Error: ${error}.`;
+    } catch (error) {
+        const errorMessage = error.error || error.message;
+        document.getElementById('progress').innerText = errorMessage;
+        window.gtag('event', 'py_err', { error: errorMessage });
+        return isMatrix ? [[errorMessage]] : errorMessage;
     }
 }
 
