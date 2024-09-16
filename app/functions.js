@@ -1,3 +1,4 @@
-import { pyrun } from "./tasks/run/controller.js";
+import { py, pyarr } from "./tasks/run/controller.js";
 
-CustomFunctions.associate("PY.RUN", pyrun);
+CustomFunctions.associate("PY", py);
+CustomFunctions.associate("PY.ARR", pyarr);

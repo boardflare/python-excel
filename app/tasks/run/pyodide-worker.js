@@ -43,40 +43,20 @@ self.onmessage = async (event) => {
 
         // Set individual globals from data1
         if (Array.isArray(data1)) {
-            data1.forEach((matrix, index) => {
-                self.pyodide.globals.set(`data${index + 1}`, matrix);
+            data1.forEach((value, index) => {
+                self.pyodide.globals.set(`data${index + 1}`, value);
             });
         }
 
         // Execute the Python code
         await self.pyodide.runPythonAsync(code);
-        let result = self.pyodide.globals.get('result');
+        let result = self.pyodide.globals.get('pyout');
 
         // Convert nested list to JS array
         if (result === null || result === undefined) {
             result = "Result is null or undefined.";
         } else if (result.toJs) {
             result = result.toJs();
-        }
-
-        // Check if array is a matrix
-        if (!Array.isArray(result) || !result.every(Array.isArray)) {
-            throw new Error("Result is not a matrix.");
-        }
-
-        // Check if matrix is valid
-        const innerLength = result[0].length;
-        const validTypes = ['number', 'string', 'boolean'];
-
-        const isValidMatrix = result.every(innerArray => {
-            if (innerArray.length !== innerLength) {
-                return false;
-            }
-            return innerArray.every(element => validTypes.includes(typeof element));
-        });
-
-        if (!isValidMatrix) {
-            throw new Error("Result matrix contains invalid elements types or inconsistent row lengths.");
         }
 
         // Clear globals
