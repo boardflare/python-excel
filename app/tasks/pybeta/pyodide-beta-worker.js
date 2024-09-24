@@ -16,7 +16,6 @@ self.onmessage = async (event) => {
     self.pyodide.globals.clear();
 
     let stdout = "";
-    let stderr = "";
 
     // Reinitialize stdout and stderr handlers
     self.pyodide.setStdout({
@@ -27,7 +26,7 @@ self.onmessage = async (event) => {
 
     self.pyodide.setStderr({
         batched: (msg) => {
-            stderr += msg + "\n";
+            stdout += "STDERR: " + msg + "\n";
         }
     });
 
@@ -77,10 +76,10 @@ self.onmessage = async (event) => {
             result = pyout.toJs({ create_proxies: false });
         }
 
-        // Return the result along with stdout and stderr
-        self.postMessage({ result, stdout, stderr });
+        // Return the result along with stdout
+        self.postMessage({ result, stdout });
     } catch (error) {
-        // Return the error along with stdout and stderr
-        self.postMessage({ error: error.message, stdout, stderr });
+        // Return the error along with stdout
+        self.postMessage({ error: error.message, stdout });
     }
 };

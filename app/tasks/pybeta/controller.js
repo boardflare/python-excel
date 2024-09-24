@@ -10,11 +10,11 @@ let pyworker = new Worker(new URL('./pyodide-beta-worker.js', import.meta.url));
 async function messageWorker(worker, message) {
     return new Promise((resolve, reject) => {
         worker.onmessage = (event) => {
-            const { result, stdout, stderr, error } = event.data;
+            const { result, stdout, error } = event.data;
             if (error) {
-                reject({ error, stdout, stderr });
+                reject({ error, stdout });
             } else {
-                resolve({ result, stdout, stderr });
+                resolve({ result, stdout });
             }
         };
         worker.onerror = (error) => {
@@ -57,13 +57,13 @@ async function fetchCodeFromUrl(url) {
 async function pythonRun({ code, data1, isMatrix }) {
     try {
         // Check if code is a URL
-        if (code.startsWith('http://') || code.startsWith('https://')) {
+        if (code.startsWith('https://')) {
             code = await fetchCodeFromUrl(code);
         }
 
-        const { result, stdout, stderr } = await messageWorker(pyworker, { code, data1 });
-        // Write stdout and stderr to the progress div
-        document.getElementById('progress').innerText = `${stdout}\n${stderr}`;
+        const { result, stdout } = await messageWorker(pyworker, { code, data1 });
+        // Write stdout to the progress div
+        document.getElementById('progress').innerText = stdout;
         // Emit gtag event
         window.gtag('event', 'py', { code_length: code.length });
 
