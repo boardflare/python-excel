@@ -46,6 +46,10 @@ function validateMatrix(result) {
 
 // Function to check if the user agent contains the required brands
 function isChromiumOrEdge() {
+    if (!navigator.userAgentData || !navigator.userAgentData.brands) {
+        console.log("navigator.userAgentData or navigator.userAgentData.brands is undefined.");
+        return false;
+    }
     console.log(navigator.userAgentData.brands);
     return navigator.userAgentData.brands.some(brand =>
         brand.brand === "Chromium" || brand.brand === "Microsoft Edge"
