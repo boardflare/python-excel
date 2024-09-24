@@ -93,14 +93,15 @@ async function pythonRun({ code, data1, isMatrix }) {
 
     } catch (error) {
         const errorMessage = error.error || error.message;
-        document.getElementById('progress').innerText = errorMessage;
+        const stdout = error.stdout || '';
+        document.getElementById('progress').innerText = `${stdout}\n${errorMessage}`;
 
         // Conditionally emit gtag error event
         if (isChromiumOrEdge()) {
             window.gtag('event', 'py_err', { error: errorMessage });
         }
-
-        return isMatrix ? [[errorMessage]] : errorMessage;
+        const notice = "Error, see console for details.";
+        return isMatrix ? [[notice]] : notice;
     }
 }
 

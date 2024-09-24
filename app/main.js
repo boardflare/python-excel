@@ -26,7 +26,7 @@ async function initializeBrowserInfo() {
     window.gtag('js', new Date());
     window.gtag('config', 'G-8XNNM225DV', {
         ...window.appConfig,
-        //debug_mode: true,
+        debug_mode: true,
         supportsF16: supportsF16,
         memory: memory,
         cores: cores
