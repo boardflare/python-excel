@@ -44,14 +44,29 @@ function validateMatrix(result) {
     });
 }
 
+// Function to check if the user agent contains the required brands
+function isChromiumOrEdge() {
+    if (!navigator.userAgentData || !navigator.userAgentData.brands) {
+        console.log("navigator.userAgentData or navigator.userAgentData.brands is undefined.");
+        return false;
+    }
+    console.log(navigator.userAgentData.brands);
+    return navigator.userAgentData.brands.some(brand =>
+        brand.brand === "Chromium" || brand.brand === "Microsoft Edge"
+    );
+}
+
 // Function to run Python code using the worker
 async function pythonRun({ code, data1, isMatrix }) {
     try {
         const { result, stdout, stderr } = await messageWorker(pyworker, { code, data1 });
         // Write stdout and stderr to the progress div
         document.getElementById('progress').innerText = `${stdout}\n${stderr}`;
-        // Emit gtag event
-        window.gtag('event', 'py', { code_length: code.length });
+
+        // Conditionally emit gtag event
+        if (isChromiumOrEdge()) {
+            window.gtag('event', 'py', { code_length: code.length });
+        }
 
         // Validate result is as expected by Excel
         if (isMatrix) {
@@ -67,7 +82,12 @@ async function pythonRun({ code, data1, isMatrix }) {
     } catch (error) {
         const errorMessage = error.error || error.message;
         document.getElementById('progress').innerText = errorMessage;
-        window.gtag('event', 'py_err', { error: errorMessage });
+
+        // Conditionally emit gtag error event
+        if (isChromiumOrEdge()) {
+            window.gtag('event', 'py_err', { error: errorMessage });
+        }
+
         return isMatrix ? [[errorMessage]] : errorMessage;
     }
 }
