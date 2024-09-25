@@ -5,8 +5,8 @@ def extract_emails(text):
     emails = re.findall(pattern, text)
     return emails
 
-# This block only runs if the script is executed directly
-# if __name__ == "__main__":
+# return first email
+pyout = extract_emails(data1)[0]
 
 sample_text = """
 Contact us at support@example.com or sales@company.co.uk.
