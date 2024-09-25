@@ -5,7 +5,7 @@ window.appName = 'Python';
 
 // Google Analytics config
 window.appConfig = {
-    app_version: "1.0.2",
+    app_version: "1.0.3",
     content_group: window.appName,
     content_type: "Excel",
 };
