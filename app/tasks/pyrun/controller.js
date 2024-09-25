@@ -10,11 +10,11 @@ let pyworker = new Worker(new URL('./pyodide-worker.js', import.meta.url));
 async function messageWorker(worker, message) {
     return new Promise((resolve, reject) => {
         worker.onmessage = (event) => {
-            const { result, stdout, stderr, error } = event.data;
+            const { result, stdout, error } = event.data;
             if (error) {
-                reject({ error, stdout, stderr });
+                reject({ error, stdout });
             } else {
-                resolve({ result, stdout, stderr });
+                resolve({ result, stdout });
             }
         };
         worker.onerror = (error) => {
@@ -44,24 +44,36 @@ function validateMatrix(result) {
     });
 }
 
+// Helper function to fetch code from a URL
+async function fetchCodeFromUrl(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch code from URL: ${response.statusText}`);
+    }
+    return await response.text();
+}
+
 // Function to check if the user agent contains the required brands
 function isChromiumOrEdge() {
-    if (!navigator.userAgentData || !navigator.userAgentData.brands) {
-        console.log("navigator.userAgentData or navigator.userAgentData.brands is undefined.");
+    const brands = navigator.userAgentData?.brands;
+    if (!brands) {
         return false;
     }
-    console.log(navigator.userAgentData.brands);
-    return navigator.userAgentData.brands.some(brand =>
-        brand.brand === "Chromium" || brand.brand === "Microsoft Edge"
-    );
+    console.log(brands);
+    return brands.some(brand => ["Chromium", "Microsoft Edge"].includes(brand.brand));
 }
 
 // Function to run Python code using the worker
 async function pythonRun({ code, data1, isMatrix }) {
     try {
-        const { result, stdout, stderr } = await messageWorker(pyworker, { code, data1 });
-        // Write stdout and stderr to the progress div
-        document.getElementById('progress').innerText = `${stdout}\n${stderr}`;
+        // Check if code is a URL
+        if (code.startsWith('https://')) {
+            code = await fetchCodeFromUrl(code);
+        }
+
+        const { result, stdout } = await messageWorker(pyworker, { code, data1 });
+        // Write stdout to the progress div
+        document.getElementById('progress').innerText = stdout;
 
         // Conditionally emit gtag event
         if (isChromiumOrEdge()) {
@@ -81,14 +93,15 @@ async function pythonRun({ code, data1, isMatrix }) {
 
     } catch (error) {
         const errorMessage = error.error || error.message;
-        document.getElementById('progress').innerText = errorMessage;
+        const stdout = error.stdout || '';
+        document.getElementById('progress').innerText = `${stdout}\n${errorMessage}`;
 
         // Conditionally emit gtag error event
         if (isChromiumOrEdge()) {
             window.gtag('event', 'py_err', { error: errorMessage });
         }
-
-        return isMatrix ? [[errorMessage]] : errorMessage;
+        const notice = "Error, see console for details.";
+        return isMatrix ? [[notice]] : notice;
     }
 }
 

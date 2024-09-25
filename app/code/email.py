@@ -5,18 +5,22 @@ def extract_emails(text):
     emails = re.findall(pattern, text)
     return emails
 
-# This block only runs if the script is executed directly
-# if __name__ == "__main__":
+extracted_emails = extract_emails(data1)
 
-sample_text = """
-Contact us at support@example.com or sales@company.co.uk.
-For personal inquiries, reach out to john.doe@email.com.
-"""
+if extracted_emails:
+    pyout = extracted_emails[0]
+else:
+    pyout = "no emails"
 
-extracted_emails = extract_emails(sample_text)
-print (extracted_emails)
-pyout = [extracted_emails]
-print (pyout)
-print("Extracted email addresses:")
-for email in extracted_emails:
-    print(email)
+# sample_text = """
+# Contact us at support@example.com or sales@company.co.uk.
+# For personal inquiries, reach out to john.doe@email.com.
+# """
+
+# 
+# print (extracted_emails)
+# pyout = [extracted_emails]
+# print (pyout)
+# print("Extracted email addresses:")
+# for email in extracted_emails:
+#     print(email)
