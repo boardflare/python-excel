@@ -12,12 +12,15 @@ async function messageWorker(worker, message) {
         worker.onmessage = (event) => {
             const { result, stdout, error } = event.data;
             if (error) {
+                console.error('Worker error:', error);
                 reject({ error, stdout });
             } else {
+                console.log('Worker result:', result);
                 resolve({ result, stdout });
             }
         };
         worker.onerror = (error) => {
+            console.error('Worker onerror:', error.message);
             reject({ error: error.message });
         };
         worker.postMessage(message);
@@ -44,39 +47,96 @@ function validateMatrix(result) {
     });
 }
 
-// Helper function to fetch code from a URL
-async function fetchCodeFromUrl(url) {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch code from URL: ${response.statusText}`);
-    }
-    return await response.text();
+// Helper function to fetch code from IndexedDB
+async function fetchCodeFromIndexedDB(key) {
+    return new Promise((resolve, reject) => {
+
+        // Ensure the IndexedDB name is unique to avoid conflicts
+        const dbName = 'JupyterLite Storage';
+        const request = indexedDB.open(dbName);
+
+        request.onsuccess = (event) => {
+            console.log('IndexedDB opened successfully.');
+            const db = event.target.result;
+
+            // Log the current version of the database
+            console.log('Current IndexedDB version:', db.version);
+
+            const transaction = db.transaction(['files'], 'readonly');
+            const store = transaction.objectStore('files');
+
+            const getRequest = store.get(key);
+            getRequest.onsuccess = (event) => {
+                if (event.target.result) {
+                    console.log('Result from key in IndexedDB:', event.target.result.content);
+                    resolve(event.target.result.content);
+                } else {
+                    console.error('No code found for the given key in IndexedDB.');
+                    reject(new Error(`File not found in Jupyter: ${key}`));
+                }
+            };
+
+            getRequest.onerror = (event) => {
+                console.error('Error fetching code from IndexedDB:', event.target.error);
+                reject(event.target.error);
+            };
+        };
+
+        request.onerror = (event) => {
+            console.error('Error opening IndexedDB:', event.target.error);
+            reject(event.target.error);
+        };
+    });
 }
 
-// Function to check if the user agent contains the required brands
-function isChromiumOrEdge() {
-    const brands = navigator.userAgentData?.brands;
-    if (!brands) {
-        return false;
+// Helper function to fetch code from a URL or IndexedDB
+async function fetchCode(source) {
+    let code;
+
+    if (source.startsWith('https://')) {
+        const response = await fetch(source);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch code from URL: ${response.statusText}`);
+        }
+        code = await response.text();
+        console.log('Code fetched from URL:', code);
+    } else if (source.endsWith('.py') || source.endsWith('.ipynb')) {
+        const key = source; // Use the source as the key
+        code = await fetchCodeFromIndexedDB(key);
+        console.log('Code fetched from IndexedDB:', code);
+    } else {
+        console.log('Using plain code string:', source);
+        code = source; // Assume it's a plain code string
     }
-    console.log(brands);
-    return brands.some(brand => ["Chromium", "Microsoft Edge"].includes(brand.brand));
+
+    if (source.endsWith('.ipynb')) {
+        const cells = code.cells.filter(cell => cell.cell_type === 'code');
+        const pyoutCell = cells.find(cell => cell.source.includes('pyout'));
+        if (pyoutCell) {
+            const pyoutCellSource = pyoutCell.source;
+            console.log('Code cell containing "pyout":', pyoutCellSource);
+            return pyoutCellSource;
+        } else {
+            throw new Error('No code cell containing "pyout" found.');
+        }
+    }
+
+    return code;
 }
 
 // Function to run Python code using the worker
 async function pythonRun({ code, data1, isMatrix }) {
     try {
-        // Check if code is a URL
-        if (code.startsWith('https://')) {
-            code = await fetchCodeFromUrl(code);
-        }
+        // Fetch code from URL, IndexedDB, or use as plain string
+        code = await fetchCode(code);
 
         const { result, stdout } = await messageWorker(pyworker, { code, data1 });
+
         // Write stdout to the progress div
         document.getElementById('progress').innerText = stdout;
 
         // Conditionally emit gtag event
-        if (isChromiumOrEdge()) {
+        if (isChromiumOrEdge) {
             window.gtag('event', 'py', { code_length: code.length });
         }
 
@@ -94,10 +154,11 @@ async function pythonRun({ code, data1, isMatrix }) {
     } catch (error) {
         const errorMessage = error.error || error.message;
         const stdout = error.stdout || '';
+        console.error('Error in pythonRun:', errorMessage);
         document.getElementById('progress').innerText = `${stdout}\n${errorMessage}`;
 
         // Conditionally emit gtag error event
-        if (isChromiumOrEdge()) {
+        if (isChromiumOrEdge) {
             window.gtag('event', 'py_err', { error: errorMessage });
         }
         const notice = "Error, see console for details.";

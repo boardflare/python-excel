@@ -10,13 +10,14 @@ window.appConfig = {
     content_type: "Excel",
 };
 
-let supportsF16 = false;
+window.supportsF16 = false;
+window.isChromiumOrEdge = false;
 
 // Function to initialize browser info
 async function initializeBrowserInfo() {
     // Browser info
     const adapter = await navigator.gpu.requestAdapter();
-    supportsF16 = adapter?.features.has('shader-f16');
+    window.supportsF16 = adapter?.features.has('shader-f16');
     const memory = navigator.deviceMemory;
     const cores = navigator.hardwareConcurrency;
     const downlink = navigator.connection.downlink;
@@ -27,11 +28,16 @@ async function initializeBrowserInfo() {
     window.gtag('config', 'G-8XNNM225DV', {
         ...window.appConfig,
         //debug_mode: true,
-        supportsF16: supportsF16,
+        supportsF16: window.supportsF16,
         memory: memory,
         cores: cores
     });
 
+    // Set isChromiumOrEdge value
+    const brands = navigator.userAgentData?.brands;
+    if (brands) {
+        isChromiumOrEdge = brands.some(brand => ["Chromium", "Microsoft Edge"].includes(brand.brand));
+    }
 }
 
 // Add elements to the DOM
