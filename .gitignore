@@ -1,4 +1,5 @@
-/jupyterlite/
+jupyterlite/
+.jupyterlite.*
 build/
 env/
 venv/

@@ -49,17 +49,17 @@
         {
             "id": "PY.BETA",
             "name": "PY.BETA",
-            "description": "Beta features with array input and output.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python#py.arr",
+            "description": "Runs Python with array input and output.",
+            "helpUrl": "https://www.boardflare.com/apps/excel/python",
             "parameters": [
                 {
                     "name": "code",
-                    "description": "Python code text or URL that assigns array output to a variable named 'pyout'.",
+                    "description": "Python code text or URL to file.",
                     "type": "string"
                 },
                 {
                     "name": "data1",
-                    "description": "Array data available as a global variable.",
+                    "description": "Array available as a global variable.",
                     "optional": true,
                     "dimensionality": "matrix",
                     "repeating": true,
@@ -69,6 +69,20 @@
             "result": {
                 "dimensionality": "matrix"
             }
+        },
+        {
+            "id": "JL",
+            "name": "JL",
+            "description": "Gets code or data from Jupyterlite.",
+            "helpUrl": "https://www.boardflare.com/apps/excel/python#jl",
+            "parameters": [
+                {
+                    "name": "path",
+                    "description": "Path to file in Jupyterlite.",
+                    "type": "string"
+                }
+            ],
+            "result": {}
         }
     ]
 }
