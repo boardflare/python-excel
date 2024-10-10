@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+  xsi:type="TaskPaneApp">
+
+  <!-- Begin Basic Settings. -->
+  <!-- IMPORTANT! Must be unique for your add-in -->
+  <Id>bb0a536a-6810-4368-bed2-56332ac48571</Id>
+
+  <!--Version.
+  Updates from the store only get triggered if there is a version change. -->
+  <Version>1.0.0.0</Version>
+  <ProviderName>Boardflare</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+
+  <!-- The display name of your add-in. Used on the store and various places of the Office UI such
+  as the add-ins dialog. -->
+  <DisplayName DefaultValue="Python for Excel" />
+  <Description DefaultValue="Run Python code locally in Excel for free." />
+  <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
+  <IconUrl DefaultValue="https://addins.boardflare.com/python/preview/images/icon-32.png" />
+  <HighResolutionIconUrl
+    DefaultValue="https://addins.boardflare.com/python/preview/images/icon-64.png" />
+  <SupportUrl DefaultValue="https://www.boardflare.com/company/support" />
+
+  <!-- Domains here can be navigated to within task pane. -->
+  <AppDomains>
+    <AppDomain>https://www.boardflare.com</AppDomain>
+  </AppDomains>
+
+
+  <!--End
+  Basic Settings. -->
+
+  <!--Begin
+  TaskPane Mode integration. This section is used if there are no VersionOverrides or if the Office
+  client version does not support add-in commands. -->
+  <Hosts>
+    <Host Name="Workbook" />
+  </Hosts>
+  <Requirements>
+    <Sets>
+      <Set Name="SharedRuntime" MinVersion="1.1" />
+      <Set Name="IdentityAPI" MinVersion="1.3" />
+    </Sets>
+  </Requirements>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://addins.boardflare.com/python/preview/home.html" />
+  </DefaultSettings>
+  <!-- End TaskPane Mode integration.  -->
+
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <!-- Begin Add-in Commands Mode integration. -->
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+    xsi:type="VersionOverridesV1_0">
+
+    <!-- The Hosts node is required. -->
+    <Hosts>
+      <!-- Each host can have a different set of commands. -->
+      <!-- Excel host is Workbook, Word host is Document, and PowerPoint host is Presentation. -->
+      <!-- Make sure the hosts you override match the hosts declared in the top section of the
+      manifest. -->
+      <Host xsi:type="Workbook">
+        <Runtimes>
+          <Runtime resid="BF.SharedRuntime.Url" lifetime="long" />
+        </Runtimes>
+
+        <AllFormFactors>
+          <ExtensionPoint xsi:type="CustomFunctions">
+            <Script>
+              <SourceLocation resid="BF.CustomFunctions.Script" />
+            </Script>
+            <Page>
+              <SourceLocation resid="BF.SharedRuntime.Url" />
+            </Page>
+            <Metadata>
+              <SourceLocation resid="BF.CustomFunctions.Json" />
+            </Metadata>
+            <Namespace resid="BF.CustomFunctions.NameSpace" />
+          </ExtensionPoint>
+        </AllFormFactors>
+
+        <!-- Form factor. Currently only DesktopFormFactor is supported. -->
+        <DesktopFormFactor>
+          <!--"This
+          code enables a customizable message to be displayed when the add-in is loaded successfully
+          upon individual install."-->
+          <GetStarted>
+            <!-- Title of the Getting Started callout. resid points to a ShortString resource -->
+            <Title resid="BF.GetStarted.Title" />
+
+            <!-- Description of the Getting Started callout. resid points to a LongString resource -->
+            <Description resid="BF.GetStarted.Description" />
+
+            <!-- Point to a url resource which details how the add-in should be used. -->
+            <LearnMoreUrl resid="BF.GetStarted.LearnMoreUrl" />
+          </GetStarted>
+
+          <!-- Function file is a HTML page that includes the JavaScript where functions for
+          ExecuteAction will be called. 
+            Think of the FunctionFile as the code behind ExecuteFunction. -->
+          <FunctionFile resid="BF.SharedRuntime.Url" />
+
+          <!-- PrimaryCommandSurface is the main Office Ribbon. -->
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <!-- Use OfficeTab to extend an existing Tab. Use CustomTab to create a new tab. -->
+            <OfficeTab id="TabHome">
+              <!-- Ensure you provide a unique id for the group. Recommendation for any IDs is to
+              namespace using your company name. -->
+              <Group id="BF.Group1">
+                <!-- Label for your group. resid must point to a ShortString resource. -->
+                <Label resid="BF.Group1Label" />
+                <!-- Icons. Required sizes 16,32,80, optional 20, 24, 40, 48, 64. Strongly
+                recommended to provide all sizes for great UX. -->
+                <!-- Use PNG icons. All URLs on the resources section must use HTTPS. -->
+                <Icon>
+                  <bt:Image size="16" resid="BF.tpicon_16x16" />
+                  <bt:Image size="32" resid="BF.tpicon_32x32" />
+                  <bt:Image size="80" resid="BF.tpicon_80x80" />
+                </Icon>
+
+                <!-- Control. It can be of type "Button" or "Menu". -->
+                <Control xsi:type="Button" id="BF.TaskpaneButton">
+                  <Label resid="BF.TaskpaneButton.Label" />
+                  <Supertip>
+                    <!-- ToolTip title. resid must point to a ShortString resource. -->
+                    <Title resid="BF.TaskpaneButton.Label" />
+                    <!-- ToolTip description. resid must point to a LongString resource. -->
+                    <Description resid="BF.TaskpaneButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="BF.tpicon_16x16" />
+                    <bt:Image size="32" resid="BF.tpicon_32x32" />
+                    <bt:Image size="80" resid="BF.tpicon_80x80" />
+                  </Icon>
+
+                  <!-- This is what happens when the command is triggered (E.g. click on the
+                  Ribbon). Supported actions are ExecuteFunction or ShowTaskpane. -->
+                  <Action xsi:type="ShowTaskpane">
+                    <!-- Provide a url resource id for the location that will be displayed on the
+                    task pane. -->
+                    <SourceLocation resid="BF.SharedRuntime.Url" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+
+    <!-- You can use resources across hosts and form factors. -->
+    <Resources>
+      <bt:Images>
+        <bt:Image id="BF.tpicon_16x16"
+          DefaultValue="https://addins.boardflare.com/python/preview/images/icon-16.png" />
+        <bt:Image id="BF.tpicon_32x32"
+          DefaultValue="https://addins.boardflare.com/python/preview/images/icon-32.png" />
+        <bt:Image id="BF.tpicon_80x80"
+          DefaultValue="https://addins.boardflare.com/python/preview/images/icon-80.png" />
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="BF.CustomFunctions.Script"
+          DefaultValue="https://addins.boardflare.com/python/preview/functions.js" />
+        <bt:Url id="BF.CustomFunctions.Json"
+          DefaultValue="https://addins.boardflare.com/python/preview/functions.json" />
+        <bt:Url id="BF.SharedRuntime.Url"
+          DefaultValue="https://addins.boardflare.com/python/preview/home.html" />
+        <bt:Url id="BF.GetStarted.LearnMoreUrl" DefaultValue="https://www.boardflare.com" />
+      </bt:Urls>
+      <!-- ShortStrings max characters==125. -->
+      <bt:ShortStrings>
+        <bt:String id="BF.TaskpaneButton.Label" DefaultValue="Python" />
+        <bt:String id="BF.Group1Label" DefaultValue="PREVIEW" />
+        <bt:String id="BF.GetStarted.Title" DefaultValue="Python for Excel" />
+        <bt:String id="BF.CustomFunctions.NameSpace" DefaultValue="BOARDFLARE" />
+      </bt:ShortStrings>
+      <!-- LongStrings max characters==250. -->
+      <bt:LongStrings>
+        <bt:String id="BF.TaskpaneButton.Tooltip" DefaultValue="Click to open task pane" />
+        <bt:String id="BF.GetStarted.Description"
+          DefaultValue="Run Python code locally in Excel for free." />
+        <!-- <bt:String id="BF.TestFuncButton.Tooltip" DefaultValue="Test AppCmd button" /> -->
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+
+  <!-- End Add-in Commands Mode integration. -->
+</OfficeApp>
