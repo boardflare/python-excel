@@ -69,20 +69,6 @@
             "result": {
                 "dimensionality": "matrix"
             }
-        },
-        {
-            "id": "JL",
-            "name": "JL",
-            "description": "Gets code or data from Jupyterlite.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python#jl",
-            "parameters": [
-                {
-                    "name": "path",
-                    "description": "Path to file in Jupyterlite.",
-                    "type": "string"
-                }
-            ],
-            "result": {}
         }
     ]
 }

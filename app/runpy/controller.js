@@ -1,4 +1,5 @@
-import { queueTask } from '../../utils/common.js';
+import { queueTask } from '../utils/common.js';
+import { fetchCode } from '../utils/fetchcode.js';
 
 // Initialize the Pyodide worker
 let pyworker = new Worker(new URL('./pyodide-worker.js', import.meta.url));
@@ -22,38 +23,6 @@ async function messageWorker(worker, message) {
         };
         worker.postMessage(message);
     });
-}
-
-// Helper function to fetch code from a URL
-async function fetchCode(source) {
-    let code;
-
-    if (source.startsWith('https://')) {
-        const response = await fetch(source);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch code from URL: ${response.statusText}`);
-        }
-        code = await response.text();
-        console.log('Code fetched from URL:', code);
-    } else {
-        console.log('Using plain code string:', source);
-        code = source; // Assume it's a plain code string
-    }
-
-    if (source.endsWith('.ipynb')) {
-        code = JSON.parse(code);
-        const cells = code.cells.filter(cell => cell.cell_type === 'code');
-        const pyoutCell = cells.find(cell => cell.source.join('').includes('pyout'));
-        if (pyoutCell) {
-            const pyoutCellSource = pyoutCell.source.join('');
-            console.log('Code cell containing "pyout":', pyoutCellSource);
-            return pyoutCellSource;
-        } else {
-            throw new Error('No code cell containing "pyout" found.');
-        }
-    }
-
-    return code;
 }
 
 // Function to run Python code using the Pyodide worker

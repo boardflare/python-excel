@@ -3,6 +3,9 @@
         "output_dir": "app/jupyterlite",
         "apps": [
             "lab"
+        ],
+        "contents": [
+            "app/notebooks"
         ]
     }
 }
