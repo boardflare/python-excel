@@ -1,9 +1,0 @@
-jupyterlite-core
-jupyterlite-pyodide-kernel
-jupyterlab_gist_it
-jupyterlab-codestral
-jupyterlab-spreadsheet-editor
-jupyter_server
-jupyterlab_server
-pandas
-numpy

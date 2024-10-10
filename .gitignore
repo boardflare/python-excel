@@ -1,8 +1,0 @@
-jupyterlite/
-.jupyterlite.*
-build/
-env/
-venv/
-node_modules/
-local/
-.env
