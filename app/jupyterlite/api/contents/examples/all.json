@@ -2,7 +2,7 @@
   "content": [
     {
       "content": null,
-      "created": "2024-10-08T17:56:39.582779Z",
+      "created": "2024-10-10T19:49:28.420930Z",
       "format": null,
       "hash": null,
       "hash_algorithm": null,
@@ -15,11 +15,11 @@
       "writable": true
     }
   ],
-  "created": "2024-10-08T17:56:39.582779Z",
+  "created": "2024-10-10T19:49:28.420930Z",
   "format": "json",
   "hash": null,
   "hash_algorithm": null,
-  "last_modified": "2024-10-08T17:56:39.582779Z",
+  "last_modified": "2024-10-10T19:49:28.420930Z",
   "mimetype": null,
   "name": "examples",
   "path": "examples",
