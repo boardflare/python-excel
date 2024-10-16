@@ -49,17 +49,17 @@
         {
             "id": "PY.BETA",
             "name": "PY.BETA",
-            "description": "Runs Python with array input and output.",
+            "description": "Runs Python code.",
             "helpUrl": "https://www.boardflare.com/apps/excel/python",
             "parameters": [
                 {
                     "name": "code",
-                    "description": "Python code text or URL to file.",
+                    "description": "Python code, path, or URL.",
                     "type": "string"
                 },
                 {
                     "name": "data1",
-                    "description": "Array available as a global variable.",
+                    "description": "Data available as a global variable.",
                     "optional": true,
                     "dimensionality": "matrix",
                     "repeating": true,

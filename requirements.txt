@@ -6,3 +6,5 @@ jupyter_server
 jupyterlab_server
 pandas
 numpy
+textdistance
+gradio
