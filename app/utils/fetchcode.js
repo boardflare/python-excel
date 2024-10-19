@@ -33,14 +33,15 @@ async function fetchJupyterlite({ path }) {
                         let content = event.target.result.content;
                         if (path.endsWith('.ipynb')) {
                             const cells = content.cells.filter(cell => cell.cell_type === 'code');
-                            const pyoutCell = cells.find(cell => cell.source.includes('pyout'));
-                            if (pyoutCell) {
-                                const pyoutCellSource = pyoutCell.source;
-                                console.log('Code cell containing "pyout":', pyoutCellSource);
-                                resolve(pyoutCellSource);
+                            const functionCell = cells.find(cell => cell?.metadata?.tags?.includes('function'));
+                            if (functionCell) {
+                                // Jupyterlite stores source as a single string, not an array of strings
+                                const functionCellSource = functionCell.source;
+                                console.log('Code cell containing "function" tag:', functionCellSource);
+                                resolve(functionCellSource);
                                 return;
                             } else {
-                                reject(new Error('No code cell containing "pyout" found.'));
+                                reject(new Error('No code cell containing "function" tag found.'));
                                 return;
                             }
                         }
@@ -101,13 +102,14 @@ export async function fetchCode(source) {
             if (source.endsWith('.ipynb')) {
                 code = JSON.parse(code);
                 const cells = code.cells.filter(cell => cell.cell_type === 'code');
-                const pyoutCell = cells.find(cell => cell.source.join('').includes('pyout'));
-                if (pyoutCell) {
-                    const pyoutCellSource = pyoutCell.source.join('');
-                    console.log('Code cell containing "pyout":', pyoutCellSource);
-                    return pyoutCellSource;
+                const functionCell = cells.find(cell => cell.metadata?.tags?.includes('function'));
+                if (functionCell) {
+                    // Regular Jupyter notebooks store source as an array of strings
+                    const functionCellSource = functionCell.source.join('');
+                    console.log('Code cell containing "function" tag:', functionCellSource);
+                    return functionCellSource;
                 } else {
-                    throw new Error('No code cell containing "pyout" found.');
+                    throw new Error('No code cell containing "function" tag found.');
                 }
             }
             console.log('Code fetched from local path:', code);
