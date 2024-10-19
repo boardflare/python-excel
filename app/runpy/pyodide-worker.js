@@ -1,10 +1,8 @@
-// Beta worker code
-
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js");
 
 async function loadPyodideAndPackages() {
     self.pyodide = await loadPyodide();
-    await self.pyodide.loadPackage("micropip");
+    await self.pyodide.loadPackage(["micropip", "pandas"]);
     self.micropip = pyodide.pyimport("micropip");
 }
 
@@ -12,7 +10,7 @@ let pyodideReadyPromise = loadPyodideAndPackages();
 
 self.onmessage = async (event) => {
     await pyodideReadyPromise;
-    const { code, data1 } = event.data;
+    const { code, arg1 } = event.data;
 
     // Clear the global state at the beginning
     self.pyodide.globals.clear();
@@ -45,82 +43,94 @@ self.onmessage = async (event) => {
             }
         }
 
-        // Set global data array from data1 to data
-        const data = data1 ? data1 : null;
-        // Set individual globals from data
-        if (data) {
-            // Set the global data variable in Python
-            self.pyodide.globals.set('data', data);
-            // Set each element of data as a global variables data1, data2, ...
-            data.forEach((value, index) => {
-                // Use flat() to flatten any nested arrays
-                value = value.flat(); // Flatten to vector
-                // Check if the flattened array has a single element
-                if (value.length === 1) {
-                    value = value[0]; // Flatten to scalar
-                }
-                self.pyodide.globals.set(`data${index + 1}`, value);
-                if (typeof value === 'object') {
-                    self.pyodide.runPython(`data${index + 1} = data${index + 1}.to_py()`);
-                }
-            });
+        // Recursive function to check for null values within nested arrays
+        function containsNull(arr) {
+            if (Array.isArray(arr)) {
+                return arr.some(containsNull);
+            }
+            return arr === null;
+        }
+
+        // Check that arg1 does not contain any null values within nested arrays
+        if (arg1 && arg1.some(containsNull)) {
+            throw new Error("Null argument(s).");
+        }
+
+        // Set global args array from arg1 to args
+        const args = arg1 ? arg1 : null;
+        // Set individual globals from args
+        if (args) {
+            // Set the global args variable in Python
+            self.pyodide.globals.set('args', args);
+            // Run Python script to create arg1, arg2, ...
+            self.pyodide.runPython(`
+        import pandas as pd
+        
+        for index, value in enumerate(args):
+            # Convert to pandas DataFrame
+            df = pd.DataFrame(value)
+            # Check if the DataFrame has only one element
+            if df.size == 1:
+                value = df.iloc[0, 0].item()
+            else:
+                value = df
+            globals()[f'arg{index + 1}'] = value
+            `);
         }
 
         // Execute the Python code
-        await self.pyodide.runPythonAsync(code);
+        let result = await self.pyodide.runPythonAsync(code);
 
-        // Check if pyout is defined
-        const pyoutDefined = self.pyodide.runPython('globals().get("pyout") is not None');
-
-        if (!pyoutDefined) {
-            throw new Error("pyout is undefined.");
+        if (result === undefined) {
+            throw new Error("Result is undefined");
         }
 
-        const pyoutType = self.pyodide.runPython('type(pyout).__name__');
-        const allowedTypes = ['list', 'int', 'float', 'str', 'bool'];
-        if (!allowedTypes.includes(pyoutType)) {
-            throw new Error(`pyout must be a list, int, float, str or bool. Found type: ${pyoutType}`);
+        // if result is a list, convert it to a JavaScript array
+        if (result.toJs) {
+            result = result.toJs({ create_proxies: false });
         }
 
-        const pyout = self.pyodide.globals.get('pyout');
-        let result = pyout;
+        // Define the isValidScalar function
+        const isValidScalar = (value) => ['number', 'string', 'boolean'].includes(typeof value);
 
-        // if pyout is a list, convert it to a JavaScript array
-        if (pyout.toJs) {
-            result = pyout.toJs({ create_proxies: false });
-        }
-
-        // If result is a scalar, convert it to a 2D matrix
-        if (!Array.isArray(result)) {
+        // Check the type of the result
+        if (isValidScalar(result)) {
+            // If result is a scalar, convert it to a 2D matrix
             result = [[result]];
-        }
-
-        // If result is a simple array, convert it to a 2D matrix
-        if (!result.every(Array.isArray)) {
-            result = [result];
-        }
-
-        // Check if result is a nested list (2D array)
-        if (result.every(Array.isArray)) {
-            const innerLength = result[0].length;
-
-            result.forEach(innerArray => {
-                if (innerArray.length !== innerLength) {
-                    throw new Error("pyout nested row lengths are not equal.");
-                }
-            });
-        }
-
-        // Define valid types globally
-        const validTypes = ['number', 'string', 'boolean'];
-
-        // Verify that all elements in result are of valid types
-        result.flat().forEach(element => {
-            if (!validTypes.includes(typeof element)) {
-                throw new Error("pyout must only contain elements of type int, float, str or bool."); // these convert to validTypes
+        } else if (Array.isArray(result)) {
+            // Check if result is an empty array
+            if (result.length === 0) {
+                throw new Error("Result must be a scalar of type int, float, str, bool or a 2D list.  All other types including Numpy arrays, Pandas DataFrames, dicts, etc. are not supported.");
             }
-        });
 
+            // If result is a simple array, convert it to a 2D matrix
+            if (!result.every(Array.isArray)) {
+                if (!result.every(isValidScalar)) {
+                    throw new Error("All elements of the result list must be valid scalar types: int, float, str, bool.");
+                }
+                result = [result];
+            }
+
+            // Check if result is a nested list (2D array)
+            if (result.every(Array.isArray)) {
+                const innerLength = result[0].length;
+
+                result.forEach(innerArray => {
+                    if (innerArray.length !== innerLength) {
+                        throw new Error("Nested row lengths are not equal.");
+                    }
+                    if (!innerArray.every(isValidScalar)) {
+                        throw new Error("All elements of the result list must be valid scalar types: int, float, str, bool.");
+                    }
+                });
+            } else {
+                throw new Error("Result is not a valid 2D list.");
+            }
+        } else {
+            throw new Error("Result must be a scalar of type int, float, str, bool or a 2D list.  All other types including Numpy arrays, Pandas DataFrames, dicts, etc. are not supported.");
+        }
+
+        // Result is now either a valid JS scalar or a JS 2D array
 
         // Return the result along with stdout
         self.postMessage({ result, stdout });

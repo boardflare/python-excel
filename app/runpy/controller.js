@@ -23,13 +23,13 @@ async function messageWorker(worker, message) {
     });
 }
 
-async function runPython({ code, data1 }) {
+async function runPython({ code, arg1 }) {
     const progressDiv = document.getElementById('progress');
     try {
         code = await fetchCode(code);
-        const { result, stdout } = await messageWorker(pyworker, { code, data1 });
+        const { result, stdout } = await messageWorker(pyworker, { code, arg1 });
 
-        progressDiv.innerText += `STDOUT: \n${stdout}`;
+        progressDiv.innerText += `\nSTDOUT: \n${stdout}`;
 
         if (isChromiumOrEdge) {
             window.gtag('event', 'py', { code_length: code.length });
@@ -50,7 +50,7 @@ async function runPython({ code, data1 }) {
     }
 }
 
-export async function runPy(code, data1) {
-    const args = { code, data1 };
+export async function runPy(code, arg1) {
+    const args = { code, arg1 };
     return await queueTask(args, runPython);
 }

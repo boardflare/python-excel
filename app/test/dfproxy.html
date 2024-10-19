@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.18.1/full/pyodide.js"></script>
+</head>
+
+<body>
+    <h1>Pyodide DataFrame to JavaScript Example</h1>
+    <p>Open your browser console to see the output.</p>
+    <script type="text/javascript">
+        async function main() {
+            let pyodide = await loadPyodide({
+                indexURL: "https://cdn.jsdelivr.net/pyodide/v0.18.1/full/"
+            });
+            await pyodide.loadPackage("pandas");
+
+            // Create a DataFrame in Python without column headers and return it as a nested list
+            pyodide.runPython(`
+              import pandas as pd
+              df = pd.DataFrame([
+                  ["foo", 4],
+                  [2, 5],
+                  [3, 6]
+              ])
+              df_list = df.values.tolist()
+            `);
+
+            // Convert the nested list to a JavaScript object
+            let df_js = pyodide.globals.get("df_list").toJs();
+
+            // Log the JavaScript object to the console
+            console.log(df_js);
+        }
+        main();
+    </script>
+</body>
+
+</html>

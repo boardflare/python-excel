@@ -5,8 +5,8 @@
         {
             "id": "PY",
             "name": "PY",
-            "description": "Runs Python code locally with scalar data and output.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python#py",
+            "description": "Deprecated, use RUNPY instead.",
+            "helpUrl": "https://www.boardflare.com/apps/excel/python",
             "parameters": [
                 {
                     "name": "code",
@@ -25,7 +25,7 @@
         {
             "id": "PY.ARR",
             "name": "PY.ARR",
-            "description": "Runs Python code locally with array data and output.",
+            "description": "Deprecated, use RUNPY instead.",
             "helpUrl": "https://www.boardflare.com/apps/excel/python#py.arr",
             "parameters": [
                 {
@@ -47,10 +47,10 @@
             }
         },
         {
-            "id": "PY.BETA",
-            "name": "PY.BETA",
-            "description": "Runs Python code.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python",
+            "id": "RUNPY",
+            "name": "RUNPY",
+            "description": "Runs Python code locally in Excel.",
+            "helpUrl": "https://www.boardflare.com/apps/excel/python#runpy",
             "parameters": [
                 {
                     "name": "code",
@@ -58,8 +58,8 @@
                     "type": "string"
                 },
                 {
-                    "name": "data1",
-                    "description": "Data available as a global variable.",
+                    "name": "arg1",
+                    "description": "Argument(s) set as a global(s).",
                     "optional": true,
                     "dimensionality": "matrix",
                     "repeating": true,
