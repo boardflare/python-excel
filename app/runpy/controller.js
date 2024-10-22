@@ -29,7 +29,7 @@ async function runPython({ code, arg1 }) {
         code = await fetchCode(code);
         const { result, stdout } = await messageWorker(pyworker, { code, arg1 });
 
-        progressDiv.innerText += `\nSTDOUT: \n${stdout}`;
+        progressDiv.innerText += `\n${stdout}`;
 
         if (isChromiumOrEdge) {
             window.gtag('event', 'py', { code_length: code.length });

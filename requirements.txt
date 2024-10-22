@@ -8,3 +8,5 @@ pandas
 numpy
 textdistance
 gradio
+nltk
+thefuzz

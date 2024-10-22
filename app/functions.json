@@ -3,6 +3,30 @@
     "allowErrorForDataTypeAny": true,
     "functions": [
         {
+            "id": "RUNPY",
+            "name": "RUNPY",
+            "description": "Runs Python code locally in Excel.",
+            "helpUrl": "https://www.boardflare.com/apps/excel/python#runpy",
+            "parameters": [
+                {
+                    "name": "code",
+                    "description": "Python code, path, or URL.",
+                    "type": "string"
+                },
+                {
+                    "name": "arg1",
+                    "description": "Argument(s) set as a global(s).",
+                    "optional": true,
+                    "dimensionality": "matrix",
+                    "repeating": true,
+                    "type": "any"
+                }
+            ],
+            "result": {
+                "dimensionality": "matrix"
+            }
+        },
+        {
             "id": "PY",
             "name": "PY",
             "description": "Deprecated, use RUNPY instead.",
@@ -36,30 +60,6 @@
                 {
                     "name": "data1",
                     "description": "Array data available as a global variable.",
-                    "optional": true,
-                    "dimensionality": "matrix",
-                    "repeating": true,
-                    "type": "any"
-                }
-            ],
-            "result": {
-                "dimensionality": "matrix"
-            }
-        },
-        {
-            "id": "RUNPY",
-            "name": "RUNPY",
-            "description": "Runs Python code locally in Excel.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python#runpy",
-            "parameters": [
-                {
-                    "name": "code",
-                    "description": "Python code, path, or URL.",
-                    "type": "string"
-                },
-                {
-                    "name": "arg1",
-                    "description": "Argument(s) set as a global(s).",
                     "optional": true,
                     "dimensionality": "matrix",
                     "repeating": true,

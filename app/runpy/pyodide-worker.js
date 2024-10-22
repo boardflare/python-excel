@@ -64,17 +64,22 @@ self.onmessage = async (event) => {
             self.pyodide.globals.set('args', args);
             // Run Python script to create arg1, arg2, ...
             self.pyodide.runPython(`
-        import pandas as pd
-        
-        for index, value in enumerate(args):
-            # Convert to pandas DataFrame
-            df = pd.DataFrame(value)
-            # Check if the DataFrame has only one element
-            if df.size == 1:
-                value = df.iloc[0, 0].item()
-            else:
-                value = df
-            globals()[f'arg{index + 1}'] = value
+                import pandas as pd
+            
+                for index, value in enumerate(args):
+                    # Convert to pandas DataFrame
+                    df = pd.DataFrame(value)
+                    # Check if the DataFrame has only one element
+                    if df.size == 1:
+                        single_value = df.iloc[0, 0]
+                        # Check if the single value is a string or boolean
+                        if isinstance(single_value, (str, bool)):
+                            value = single_value
+                        else:
+                            value = single_value.item()
+                    else:
+                        value = df
+                    globals()[f'arg{index + 1}'] = value
             `);
         }
 
