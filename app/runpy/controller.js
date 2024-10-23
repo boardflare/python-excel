@@ -24,6 +24,10 @@ async function messageWorker(worker, message) {
 }
 
 async function runPython({ code, arg1 }) {
+    if (!code) {
+        throw new Error('Code is not defined.');
+    }
+
     const progressDiv = document.getElementById('progress');
     try {
         code = await fetchCode(code);
