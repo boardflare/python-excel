@@ -73,7 +73,8 @@ async function pythonRun({ code, data1, isMatrix }) {
 
         const { result, stdout } = await messageWorker(pyworker, { code, data1 });
         // Write stdout to the progress div
-        document.getElementById('progress').innerText = stdout;
+        document.getElementById('progress').innerText = "PY and PY.ARR have been deprecated and will be removed on Nov 1, 2024. Please use BOARDFLARE.RUNPY instead for both scalar and array uses.  See website documentation for more details.";
+        document.getElementById('progress').innerText += stdout;
 
         // Conditionally emit gtag event
         if (isChromiumOrEdge()) {

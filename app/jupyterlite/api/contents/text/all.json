@@ -1,0 +1,43 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2024-10-17T04:38:29.985456Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2024-10-15T22:05:39.282150Z",
+      "mimetype": null,
+      "name": "extract.ipynb",
+      "path": "text/extract.ipynb",
+      "size": 889,
+      "type": "notebook",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2024-10-17T04:38:29.998601Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2024-10-17T02:07:36.257117Z",
+      "mimetype": null,
+      "name": "fuzzy_distance.ipynb",
+      "path": "text/fuzzy_distance.ipynb",
+      "size": 11000,
+      "type": "notebook",
+      "writable": true
+    }
+  ],
+  "created": "2024-10-17T04:38:29.984438Z",
+  "format": "json",
+  "hash": null,
+  "hash_algorithm": null,
+  "last_modified": "2024-10-17T04:38:29.998601Z",
+  "mimetype": null,
+  "name": "text",
+  "path": "text",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}

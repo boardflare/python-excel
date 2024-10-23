@@ -1,5 +1,3 @@
-# name: Static prod deploy
-
 name: Static prod deploy
 
 on:
@@ -13,8 +11,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Upload to blob storage
+    - name: Sync with blob storage
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name 'boardflareaddins' -d 'python/prod' -s './app' --overwrite --sas-token '${{ secrets.CONTAINER_SAS_TOKEN }}'
+            az storage blob sync --account-name 'boardflareaddins' -c 'python/prod' -s './app' --delete-destination true --sas-token '${{ secrets.CONTAINER_SAS_TOKEN }}'
