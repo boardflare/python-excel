@@ -43,19 +43,6 @@ self.onmessage = async (event) => {
             }
         }
 
-        // Recursive function to check for null values within nested arrays
-        function containsNull(arr) {
-            if (Array.isArray(arr)) {
-                return arr.some(containsNull);
-            }
-            return arr === null;
-        }
-
-        // Check that arg1 does not contain any null values within nested arrays
-        if (arg1 && arg1.some(containsNull)) {
-            throw new Error("Null argument(s).");
-        }
-
         // Set global args array from arg1 to args
         const args = arg1 ? arg1 : null;
         // Set individual globals from args

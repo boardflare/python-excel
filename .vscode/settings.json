@@ -4,6 +4,6 @@
           "text": "Always return the full completed code, keeping all previous comments."
         }
       ],
-      "github.copilot.chat.experimental.detectParticipant.enabled": false,
+      "chat.experimental.detectParticipant.enabled": false,
       "github.copilot.chat.experimental.temporalContext.enabled": false,
 }
