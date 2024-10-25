@@ -86,7 +86,7 @@ self.onmessage = async (event) => {
         let result = await self.pyodide.runPythonAsync(code);
 
         if (result === undefined) {
-            throw new Error("Result is undefined");
+            throw new Error("Your function returned None. If you wanted a blank cell, return an empty string ('') instead.");
         }
 
         // if result is a list, convert it to a JavaScript array
