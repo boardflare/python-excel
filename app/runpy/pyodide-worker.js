@@ -43,20 +43,31 @@ self.onmessage = async (event) => {
             }
         }
 
+        // empty cell passes [[null]] as arg
+        // skipping args with commas passes null as arg
+        // unfilled optional args in LAMBDA passes FALSE, so [[false]] as arg
+        // no args passed, arg1 is []
+
         // Set global args array from arg1 to args
         const args = arg1 ? arg1 : null;
         // Set individual globals from args
         if (args) {
-            // Set the global args variable in Python
+            // Set the args array in Python
             self.pyodide.globals.set('args', args);
-            // Run Python script to create arg1, arg2, ...
+            // Run script to create arg1, arg2, globals from args
             self.pyodide.runPython(`
                 import pandas as pd
-            
+                
                 for index, value in enumerate(args):
-                    # Convert to pandas DataFrame
+                    # Check if None due to skipped repeating arg
+                    if value is None:
+                        globals()[f'arg{index + 1}'] = None
+                        continue
+                    
+                    # Convert to pandas DataFrame, handles [[None]]
                     df = pd.DataFrame(value)
-                    # Check if the DataFrame has only one element
+                    
+                    # If only one element, convert to scalar
                     if df.size == 1:
                         single_value = df.iloc[0, 0]
                         # Check if the single value is a string or boolean
@@ -66,6 +77,7 @@ self.onmessage = async (event) => {
                             value = single_value.item()
                     else:
                         value = df
+                    
                     globals()[f'arg{index + 1}'] = value
             `);
         }
