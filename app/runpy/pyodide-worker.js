@@ -70,8 +70,8 @@ self.onmessage = async (event) => {
                     # If only one element, convert to scalar
                     if df.size == 1:
                         single_value = df.iloc[0, 0]
-                        # Check if the single value is a string or boolean
-                        if isinstance(single_value, (str, bool)):
+                        # Check if the single value is None, string, or boolean
+                        if isinstance(single_value, (type(None), str, bool)):
                             value = single_value
                         else:
                             value = single_value.item()
