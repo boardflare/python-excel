@@ -13,9 +13,8 @@ async function fetchJupyterlite({ path }) {
             const request = indexedDB.open(dbName);
 
             request.onsuccess = (event) => {
-                console.log('IndexedDB opened successfully.');
+
                 const db = event.target.result;
-                console.log('Current IndexedDB version:', db.version);
 
                 if (!db.objectStoreNames.contains('files')) {
                     console.error('Object store "files" does not exist in IndexedDB.');
@@ -84,7 +83,6 @@ export async function fetchCode(source) {
                 }
             }
             code = await response.text();
-            console.log('Code fetched from URL:', code);
         } catch (error) {
             if (error instanceof TypeError) {
                 throw new Error(`Error fetching code from URL:\n ${source}\n This might be due to missing CORS headers.\n Original error: ${error.message}`);
@@ -94,7 +92,7 @@ export async function fetchCode(source) {
         }
     } else if (source.endsWith('.ipynb') || source.endsWith('.py')) {
         try {
-            const response = await fetch(`./notebooks/${source}`);
+            const response = await fetch(`https://addins.boardflare.com/functions/prod/notebooks/${source}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch code from local path: ${response.statusText}`);
             }
@@ -106,22 +104,20 @@ export async function fetchCode(source) {
                 if (functionCell) {
                     // Regular Jupyter notebooks store source as an array of strings
                     const functionCellSource = functionCell.source.join('');
-                    console.log('Code cell containing "function" tag:', functionCellSource);
                     return functionCellSource;
                 } else {
                     throw new Error('No code cell containing "function" tag found.');
                 }
             }
-            console.log('Code fetched from local path:', code);
         } catch (error) {
             try {
                 code = await fetchJupyterlite({ path: source });
             } catch (fetchJupyterliteError) {
-                throw new Error(`Error fetching code from JupyterLite: ${fetchJupyterliteError.message}`);
+                throw fetchJupyterliteError;
             }
         }
     } else {
-        console.log('Using plain code string:', source);
+        // Use code string as is
         code = source;
     }
 

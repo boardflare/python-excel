@@ -33,7 +33,7 @@ async function runPython({ code, arg1 }) {
         code = await fetchCode(code);
         const { result, stdout } = await messageWorker(pyworker, { code, arg1 });
 
-        progressDiv.innerText += `\n${stdout}`;
+        progressDiv.innerText += `\n${stdout.trim()}`;
 
         if (isChromiumOrEdge) {
             window.gtag('event', 'py', { code_length: code.length });
@@ -45,7 +45,7 @@ async function runPython({ code, arg1 }) {
         const errorMessage = error.error || error.message;
         const stdout = error.stdout || '';
         console.error('Error in runPython:', errorMessage);
-        progressDiv.innerText += `\n${stdout}\n${errorMessage}`;
+        progressDiv.innerText += `\n${stdout.trim()}\n${errorMessage}`;
 
         if (isChromiumOrEdge) {
             window.gtag('event', 'py_err', { error: errorMessage });
