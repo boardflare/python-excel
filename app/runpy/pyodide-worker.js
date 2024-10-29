@@ -57,6 +57,7 @@ self.onmessage = async (event) => {
             // Run script to create arg1, arg2, globals from args
             self.pyodide.runPython(`
                 import pandas as pd
+                import micropip
                 
                 for index, value in enumerate(args):
                     # Check if None due to skipped repeating arg
