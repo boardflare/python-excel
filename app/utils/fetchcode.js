@@ -83,6 +83,18 @@ export async function fetchCode(source) {
                 }
             }
             code = await response.text();
+            if (source.endsWith('.ipynb')) {
+                code = JSON.parse(code);
+                const cells = code.cells.filter(cell => cell.cell_type === 'code');
+                const functionCell = cells.find(cell => cell.metadata?.tags?.includes('function'));
+                if (functionCell) {
+                    // Regular Jupyter notebooks store source as an array of strings
+                    const functionCellSource = functionCell.source.join('');
+                    return functionCellSource;
+                } else {
+                    throw new Error('No code cell containing "function" tag found.');
+                }
+            }
         } catch (error) {
             if (error instanceof TypeError) {
                 throw new Error(`Error fetching code from URL:\n ${source}\n This might be due to missing CORS headers.\n Original error: ${error.message}`);
@@ -90,6 +102,7 @@ export async function fetchCode(source) {
                 throw new Error(`Error fetching code from URL:\n ${source}\n Error: ${error.message}`);
             }
         }
+        // Loads code using path only from prod or jupyterlite
     } else if (source.endsWith('.ipynb') || source.endsWith('.py')) {
         try {
             const response = await fetch(`https://addins.boardflare.com/functions/prod/notebooks/${source}`);

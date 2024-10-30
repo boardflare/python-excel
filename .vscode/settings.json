@@ -1,9 +1,9 @@
 {
-    "github.copilot.chat.experimental.codeGeneration.instructions": [
+  "chat.experimental.detectParticipant.enabled": false,
+      "github.copilot.chat.experimental.temporalContext.enabled": false,
+      "github.copilot.chat.codeGeneration.instructions": [
         {
           "text": "Always return the full completed code, keeping all previous comments."
         }
       ],
-      "chat.experimental.detectParticipant.enabled": false,
-      "github.copilot.chat.experimental.temporalContext.enabled": false,
 }
