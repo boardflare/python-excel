@@ -11,7 +11,6 @@ async function messageWorker(worker, message) {
                 console.error('Worker successfully returned message but with an error:', error, 'stdout:', stdout);
                 reject({ error, stdout });
             } else {
-                console.log('Worker successfully returned result:', result, 'stdout:', stdout);
                 resolve({ result, stdout });
             }
         };
