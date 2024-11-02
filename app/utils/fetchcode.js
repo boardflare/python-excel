@@ -105,7 +105,7 @@ export async function fetchCode(source) {
         // Loads code using path only from prod or jupyterlite
     } else if (source.endsWith('.ipynb') || source.endsWith('.py')) {
         try {
-            const response = await fetch(`https://addins.boardflare.com/functions/prod/notebooks/${source}`);
+            const response = await fetch(`https://functions.boardflare.com/notebooks/${source}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch code from local path: ${response.statusText}`);
             }
