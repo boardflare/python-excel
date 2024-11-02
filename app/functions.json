@@ -15,51 +15,7 @@
                 },
                 {
                     "name": "arg1",
-                    "description": "Argument(s) set as a global(s).",
-                    "optional": true,
-                    "dimensionality": "matrix",
-                    "repeating": true,
-                    "type": "any"
-                }
-            ],
-            "result": {
-                "dimensionality": "matrix"
-            }
-        },
-        {
-            "id": "PY",
-            "name": "PY",
-            "description": "Deprecated, use RUNPY instead.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python",
-            "parameters": [
-                {
-                    "name": "code",
-                    "description": "Python code that assigns scalar output to a variable named 'pyout'.",
-                    "type": "string"
-                },
-                {
-                    "name": "data1",
-                    "description": "Scalar data available as a global variable.",
-                    "repeating": true,
-                    "type": "any"
-                }
-            ],
-            "result": {}
-        },
-        {
-            "id": "PY.ARR",
-            "name": "PY.ARR",
-            "description": "Deprecated, use RUNPY instead.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python#py.arr",
-            "parameters": [
-                {
-                    "name": "code",
-                    "description": "Python code that assigns array output to a variable named 'pyout'.",
-                    "type": "string"
-                },
-                {
-                    "name": "data1",
-                    "description": "Array data available as a global variable.",
+                    "description": "Arguments to be set as a globals, scalar or array.",
                     "optional": true,
                     "dimensionality": "matrix",
                     "repeating": true,
