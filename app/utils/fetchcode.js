@@ -37,7 +37,7 @@ export async function fetchCode(source) {
         try {
             const response = await fetch(`https://functions.boardflare.com/notebooks/${source}`);
             if (!response.ok) {
-                throw new Error(`Failed to fetch code from local path: ${response.statusText}`);
+                throw new Error(`Failed to fetch code from path. Status: ${response.status}`);
             }
             code = await response.text();
             if (source.endsWith('.ipynb')) {
