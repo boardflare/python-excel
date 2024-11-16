@@ -1,6 +1,0 @@
-.jupyterlite.*
-env/
-venv/
-node_modules/
-local/
-.env
