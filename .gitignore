@@ -3,3 +3,4 @@ local/
 .env
 .wrangler/
 .dev.vars
+venv/

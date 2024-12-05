@@ -36,9 +36,8 @@ export default {
 				prompt: prompt
 			});
 
-			const db = env.DB;
 			const now = new Date().toISOString();
-			const insertCode = await db
+			const insertCode = await env.DB
 				.prepare("INSERT INTO functions (created, function) VALUES (?, ?)")
 				.bind(now, text)
 				.run();
