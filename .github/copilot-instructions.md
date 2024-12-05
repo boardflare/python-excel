@@ -1,0 +1,1 @@
+This is a cloudflare worker project.  Use JavaScript to write your worker code.

@@ -1,0 +1,17 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "codepy"
+main = "src/index.js"
+compatibility_date = "2024-11-06"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "codepy"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "python_excel"
+database_id = "07175214-0e5c-4737-9018-5b185439ee30"

@@ -1,0 +1,18 @@
+### codepy local endpoint
+
+POST https://localhost:8787 HTTP/1.1
+content-type: application/json
+
+{
+    "id": "550e8400-e29b-41d4-a716-446655440002",
+    "prompt": "Write a Python function that takes a list of integers and returns the sum of all the integers in the list"
+}
+
+### codepy production endpoint
+POST https://codepy.boardflare.workers.dev HTTP/1.1
+content-type: application/json
+
+{
+    "id": "550e8400-e29b-41d4-a716-446655440002",
+    "prompt": "Write a Python function that takes a list of integers and returns the sum of all the integers in the list"
+}
