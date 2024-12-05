@@ -44,7 +44,7 @@ export default {
 
 			return Response.json({
 				success: true,
-				message: text
+				code: text
 			}, { headers });
 		} catch (error) {
 			return Response.json({
