@@ -21,7 +21,7 @@ export default {
 		}
 
 		try {
-			const { id, prompt } = await request.json();
+			const { prompt } = await request.json();
 
 			const mistral = createMistral({
 				baseURL: `https://gateway.ai.cloudflare.com/v1/92d55664b831823cc914de02c9a0d0ae/codepy/mistral`,
@@ -39,8 +39,8 @@ export default {
 			const db = env.DB;
 			const now = new Date().toISOString();
 			const insertCode = await db
-				.prepare("INSERT INTO functions (created, modified, function) VALUES (?, ?, ?)")
-				.bind(now, now, text)
+				.prepare("INSERT INTO functions (created, function) VALUES (?, ?)")
+				.bind(now, text)
 				.run();
 
 			return Response.json({
