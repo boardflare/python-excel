@@ -5,9 +5,6 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import { createMistral } from '@ai-sdk/mistral';
-import { generateText } from 'ai';
-
 const headers = {
 	'Access-Control-Allow-Origin': '*',
 	'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -21,30 +18,33 @@ export default {
 		}
 
 		try {
-			const { prompt } = await request.json();
+			const { genText } = await request.json();
 
-			const mistral = createMistral({
-				baseURL: `https://gateway.ai.cloudflare.com/v1/92d55664b831823cc914de02c9a0d0ae/codepy/mistral`,
-				apiKey: env.MISTRAL_API_KEY,
+			const response = await fetch('https://gateway.ai.cloudflare.com/v1/92d55664b831823cc914de02c9a0d0ae/codepy/mistral/chat/completions', {
+				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${env.MISTRAL_API_KEY}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(genText),
 			});
 
-			const { text } = await generateText({
-				model: mistral('codestral-2405'),
-				maxTokens: 1000,
-				temperature: 0.1,
-				maxRetries: 3,
-				prompt: prompt
-			});
+			if (!response.ok) {
+				throw new Error(`Mistral API error: ${response.statusText}`);
+			}
+
+			const result = await response.json();
+			const text = result.choices[0].message.content;
 
 			const now = new Date().toISOString();
-			const insertCode = await env.DB
+			await env.DB
 				.prepare("INSERT INTO functions (created, function) VALUES (?, ?)")
 				.bind(now, text)
 				.run();
 
 			return Response.json({
 				success: true,
-				code: text
+				message: text
 			}, { headers });
 		} catch (error) {
 			return Response.json({

@@ -25,6 +25,40 @@
             "result": {
                 "dimensionality": "matrix"
             }
+        },
+        {
+            "id": "CODEPY",
+            "name": "CODEPY",
+            "description": "Creates custom Excel functions using Python.",
+            "helpUrl": "https://www.boardflare.com/apps/excel/python#codepy",
+            "parameters": [
+                {
+                    "name": "name",
+                    "description": "Name of function.",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "description": "Description of function.",
+                    "type": "string"
+                },
+                {
+                    "name": "args",
+                    "description": "Argument names as a comma separated list.",
+                    "type": "string"
+                },
+                {
+                    "name": "arg1",
+                    "description": "Example data in positional order of arguments, last is expected output.",
+                    "optional": true,
+                    "dimensionality": "matrix",
+                    "repeating": true,
+                    "type": "any"
+                }
+            ],
+            "result": {
+                "dimensionality": "matrix"
+            }
         }
     ]
 }
