@@ -57,13 +57,13 @@ async function runPython({ code, arg1 }) {
     }
 }
 
-async function callWorker(genText) {
+async function callWorker(description, arg1) {
     const response = await fetch('https://codepy.boardflare.workers.dev/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ genText })
+        body: JSON.stringify({ description, arg1 })
     });
 
     if (!response.ok) {
@@ -78,23 +78,14 @@ async function callWorker(genText) {
     return data.message;
 }
 
-async function codePython({ name, description, args, arg1 }) {
-    if (!name || !description || !args) {
-        throw new Error('Required parameters are not defined.');
+// Gets initial draft of code
+async function codePython({ description, arg1 }) {
+    if (!description) {
+        throw new Error('Description is required.');
     }
 
     try {
-        const prompt = `Create a Python function named ${name} that ${description}. The function should accept these parameters: ${args}
-            ${arg1 ? `Example input/output: ${JSON.stringify(arg1)}` : ''}`;
-
-        const genText = {
-            model: 'codestral-2405',
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 1000,
-            temperature: 0.1
-        };
-
-        const code = await callWorker(genText);
+        const code = await callWorker(description, arg1);
         return [[code]];
 
     } catch (error) {
@@ -103,7 +94,7 @@ async function codePython({ name, description, args, arg1 }) {
     }
 }
 
-export async function codePy(name, description, args, arg1) {
-    const argsObj = { name, description, args, arg1 };
+export async function codePy(description, arg1) {
+    const argsObj = { description, arg1 };
     return await queueTask(argsObj, codePython);
 }

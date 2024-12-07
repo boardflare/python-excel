@@ -4,7 +4,8 @@ POST https://localhost:8787 HTTP/1.1
 content-type: application/json
 
 {
-    "prompt": "Write a Python function that takes a list of integers and returns the sum of all the integers in the list"
+    "description": "Finds the dot product of two column vectors arg1 and arg2",
+    "arg1": [[1], [2], [3]]
 }
 
 ### codepy production endpoint
@@ -12,15 +13,6 @@ POST https://codepy.boardflare.workers.dev HTTP/1.1
 content-type: application/json
 
 {
-    "genText": {
-        "model": "codestral-2405",
-        "messages": [
-            {
-                "role": "user",
-                "content": "Write a Python function that takes a list of integers and returns the sum of all the integers in the list"
-            }
-        ],
-        "max_tokens": 1000,
-        "temperature": 0.1
-    }
+    "description": "Write a Python function that takes a list of integers and returns the sum of all the integers in the list",
+    "arg1": [1, 2, 3, 4, 5]
 }
