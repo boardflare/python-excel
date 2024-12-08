@@ -67,7 +67,7 @@ export default {
 			const invocation = `${fname}(${numberedArgs.join(', ')})`;
 
 			// Create the prompt strings
-			const promptStart = `# Start globals\n${argAssignments}\n\n${prompt}`;
+			const promptStart = `# Set globals\n${argAssignments}\n\n${prompt}`;
 			const promptSuffix = `\n\nresult = ${invocation}\nprint(result)`;
 
 			const genText = {
@@ -103,7 +103,7 @@ export default {
 			revisedCode = codeMatch ? codeMatch[1] : revisedCode;
 
 			// Remove arg assignments 
-			revisedCode = revisedCode.replace(/# Start globals[\s\S]*?\n\n/, '');
+			revisedCode = revisedCode.replace(/# Set globals[\s\S]*?\n\n/, '');
 
 			// Add results to the end of the code
 			revisedCode += "\nresult";
