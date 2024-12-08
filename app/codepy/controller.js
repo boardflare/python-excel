@@ -30,13 +30,13 @@ async function fimLLM(start, arg1) {
 }
 
 // Gets initial draft of code
-async function codePython({ start, arg1 }) {
-    if (!start) {
+async function codePython({ prompt, arg1 }) {
+    if (!prompt) {
         throw new Error('Docstring is required.');
     }
 
     try {
-        const code = await fimLLM(start, arg1);
+        const code = await fimLLM(prompt, arg1);
         return [[code]];
 
     } catch (error) {

@@ -1,3 +1,5 @@
+// Web worker that executes Python code using Pyodide.
+
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js");
 
 async function loadPyodideAndPackages() {
@@ -57,6 +59,7 @@ self.onmessage = async (event) => {
             // Run script to create arg1, arg2, globals from args
             self.pyodide.runPython(`
                 import pandas as pd
+                import numpy as np
                 import micropip
                 
                 for index, value in enumerate(args):
@@ -86,61 +89,110 @@ self.onmessage = async (event) => {
         // Execute the Python code
         let result = await self.pyodide.runPythonAsync(code);
 
-        if (result === undefined) {
-            throw new Error("Your function returned None. If you wanted a blank cell, return an empty string ('') instead.");
+        // Check if there's a result in Python globals
+        const hasGlobalResult = self.pyodide.runPython(`'result' in globals()`);
+
+        if (hasGlobalResult) {
+            // Use Python convert_result() for all type checking and conversion
+            result = self.pyodide.runPython(`
+                def convert_result():
+                    result = globals()['result']
+                    
+                    if result is None:
+                        raise ValueError("Your function returned None. If you wanted a blank cell, return an empty string ('') instead.")
+                        
+                    if isinstance(result, (int, float, str, bool)):
+                        return [[result]]
+                        
+                    if isinstance(result, pd.DataFrame):
+                        return result.values.tolist()
+                    if isinstance(result, pd.Series):
+                        return [[x] for x in result.values.tolist()]
+                        
+                    if isinstance(result, np.ndarray):
+                        if result.ndim == 0:
+                            return [[result.item()]]
+                        elif result.ndim == 1:
+                            return [result.tolist()]
+                        else:
+                            return np.array(result, dtype=object).tolist()
+                            
+                    if isinstance(result, (np.integer, np.floating)):
+                        return [[result.item()]]
+                        
+                    if isinstance(result, list):
+                        if not result:
+                            raise ValueError("Result cannot be an empty list")
+                            
+                        if not any(isinstance(x, list) for x in result):
+                            if not all(isinstance(x, (int, float, str, bool)) for x in result):
+                                raise ValueError("All elements must be scalar types (int, float, str, bool)")
+                            return [result]
+                            
+                        if not all(isinstance(row, list) for row in result):
+                            raise ValueError("Result must be a valid 2D list")
+                            
+                        width = len(result[0])
+                        if not all(len(row) == width for row in result):
+                            raise ValueError("All rows must have the same length")
+                            
+                        if not all(isinstance(x, (int, float, str, bool)) 
+                                  for row in result for x in row):
+                            raise ValueError("All elements must be scalar types (int, float, str, bool)")
+                            
+                        return result
+                        
+                    raise ValueError("Result must be a scalar or 2D list. Other types including dicts are not supported.")
+                    
+                convert_result()
+            `);
+        } else {
+            // Handle direct function returns with JS validation
+            if (result === undefined) {
+                throw new Error("Your function returned None. If you wanted a blank cell, return an empty string ('') instead.");
+            }
+
+            const isValidScalar = (value) => ['number', 'string', 'boolean'].includes(typeof value);
+
+            if (isValidScalar(result)) {
+                result = [[result]];
+            } else if (Array.isArray(result)) {
+                if (result.length === 0) {
+                    throw new Error("Result must be a scalar of type int, float, str, bool or a 2D list.");
+                }
+
+                if (!result.every(Array.isArray)) {
+                    if (!result.every(isValidScalar)) {
+                        throw new Error("All elements must be valid scalar types: int, float, str, bool.");
+                    }
+                    result = [result];
+                }
+
+                if (result.every(Array.isArray)) {
+                    const innerLength = result[0].length;
+                    result.forEach(innerArray => {
+                        if (innerArray.length !== innerLength) {
+                            throw new Error("All rows must have the same length.");
+                        }
+                        if (!innerArray.every(isValidScalar)) {
+                            throw new Error("All elements must be valid scalar types: int, float, str, bool.");
+                        }
+                    });
+                } else {
+                    throw new Error("Result must be a valid 2D list.");
+                }
+            } else {
+                throw new Error("Result must be a scalar or 2D list.");
+            }
         }
 
-        // if result is a list, convert it to a JavaScript array
+        // Convert to JavaScript array if needed
         if (result.toJs) {
             result = result.toJs({ create_proxies: false });
         }
 
-        // Define the isValidScalar function
-        const isValidScalar = (value) => ['number', 'string', 'boolean'].includes(typeof value);
-
-        // Check the type of the result
-        if (isValidScalar(result)) {
-            // If result is a scalar, convert it to a 2D matrix
-            result = [[result]];
-        } else if (Array.isArray(result)) {
-            // Check if result is an empty array
-            if (result.length === 0) {
-                throw new Error("Result must be a scalar of type int, float, str, bool or a 2D list.  All other types including Numpy arrays, Pandas DataFrames, dicts, etc. are not supported.");
-            }
-
-            // If result is a simple array, convert it to a 2D matrix
-            if (!result.every(Array.isArray)) {
-                if (!result.every(isValidScalar)) {
-                    throw new Error("All elements of the result list must be valid scalar types: int, float, str, bool.");
-                }
-                result = [result];
-            }
-
-            // Check if result is a nested list (2D array)
-            if (result.every(Array.isArray)) {
-                const innerLength = result[0].length;
-
-                result.forEach(innerArray => {
-                    if (innerArray.length !== innerLength) {
-                        throw new Error("Nested row lengths are not equal.");
-                    }
-                    if (!innerArray.every(isValidScalar)) {
-                        throw new Error("All elements of the result list must be valid scalar types: int, float, str, bool.");
-                    }
-                });
-            } else {
-                throw new Error("Result is not a valid 2D list.");
-            }
-        } else {
-            throw new Error("Result must be a scalar of type int, float, str, bool or a 2D list.  All other types including Numpy arrays, Pandas DataFrames, dicts, etc. are not supported.");
-        }
-
-        // Result is now either a valid JS scalar or a JS 2D array
-
-        // Return the result along with stdout
         self.postMessage({ result, stdout });
     } catch (error) {
-        // Return the error along with stdout
         self.postMessage({ error: error.message, stdout });
     }
 };

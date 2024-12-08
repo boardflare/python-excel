@@ -18,10 +18,10 @@ export default {
 		}
 
 		try {
-			const { start, arg1 } = await request.json();
+			const { prompt, arg1 } = await request.json();
 
 			// Extract function name and args from docstring
-			const match = start.match(/(\w+)\(([\w\s,]+)\)/);
+			const match = prompt.match(/(\w+)\(([\w\s,]+)\)/);
 
 			if (!match) {
 				throw new Error("Could not find function definition.");
@@ -66,17 +66,18 @@ export default {
 			// Construct invocation with numbered args
 			const invocation = `${fname}(${numberedArgs.join(', ')})`;
 
-			// Create the combined prompt string
-			const prompt = `# Set args as globals\n${argAssignments}\n\n${start}\n\n`;
+			// Create the prompt strings
+			const promptStart = `# Start globals\n${argAssignments}\n\n${prompt}`;
+			const promptSuffix = `\n\nresult = ${invocation}\nprint(result)`;
 
-			const suffix = `\n\n# Test the function\nresult = ${invocation}\nprint(result)`;
-
-			const fimPrompt = {
-				model: 'codestral-2405',
-				prompt,
-				suffix,
-				max_tokens: 1000,
-				temperature: 0
+			const genText = {
+				model: 'mistral-large-2411',
+				messages: [
+					{ role: 'system', content: "Rewrite the Python code provided by the user to fill in any missing pieces or correct any errors.  Functions must return either a standard Python scalar (int, float, str, bool) or a nested list of scalars.  Return only the updated code." },
+					{ role: 'user', content: promptStart + promptSuffix },
+				],
+				max_tokens: 1500,
+				temperature: 0.1
 			};
 			console.log("fimPrompt", fimPrompt);
 
@@ -93,12 +94,21 @@ export default {
 				throw new Error(`Mistral API error: ${response.statusText}`);
 			}
 
-			const fimResult = await response.json();
-			const fimText = fimResult.choices[0].message.content;
-			console.log(fimText);
+			const result = await response.json();
+			let revisedCode = result.choices[0].message.content;
 
-			const text = `${prompt}\n\n${fimText}${invocation}`;
-			console.log(text);
+			// Extract code from markdown if present
+			const pythonCodeRegex = /```(?:python)?\n([\s\S]*?)```/;
+			const codeMatch = revisedCode.match(pythonCodeRegex);
+			revisedCode = codeMatch ? codeMatch[1] : revisedCode;
+
+			// Remove arg assignments 
+			revisedCode = revisedCode.replace(/# Start globals[\s\S]*?\n\n/, '');
+
+			// Add results to the end of the code
+			revisedCode += "\nresult";
+
+			const text = revisedCode;
 
 			// Log LLM prompt and result to database
 			const llmData = JSON.stringify({

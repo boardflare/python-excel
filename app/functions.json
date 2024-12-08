@@ -33,8 +33,8 @@
             "helpUrl": "https://www.boardflare.com/apps/excel/python#codepy",
             "parameters": [
                 {
-                    "name": "docstring",
-                    "description": "Python docstring for function.",
+                    "name": "prompt",
+                    "description": "Prompt for LLM model to write code.",
                     "type": "string"
                 },
                 {
