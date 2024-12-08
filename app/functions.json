@@ -33,8 +33,8 @@
             "helpUrl": "https://www.boardflare.com/apps/excel/python#codepy",
             "parameters": [
                 {
-                    "name": "description",
-                    "description": "Description of function.",
+                    "name": "docstring",
+                    "description": "Python docstring for function.",
                     "type": "string"
                 },
                 {

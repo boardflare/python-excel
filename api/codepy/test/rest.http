@@ -1,11 +1,36 @@
 ### codepy local endpoint
-
 POST https://localhost:8787 HTTP/1.1
 content-type: application/json
 
 {
-    "description": "Finds the dot product of two column vectors arg1 and arg2",
-    "arg1": [[1], [2], [3]]
+    "start": "import pandas as pd\n\ndef dot_product(a, b):\n    \"\"\"Calculates the dot product of two DataFrame column vectors.",
+    "arg1": [
+        [[1], [2], [3]],
+        [[4], [5], [6]]
+    ]
+}
+
+### codepy local endpoint
+POST https://localhost:8787 HTTP/1.1
+content-type: application/json
+
+{
+    "start": "import requests\n\ndef get_weather(city):\n    \"\"\"Calls a public weather api to get the current weather for a city in the US.",
+    "arg1": [
+        [["New York"]]
+    ]
+}
+
+### codepy local endpoint
+POST https://localhost:8787 HTTP/1.1
+content-type: application/json
+
+{
+    "start": "import pandas as pd\n\ndef dot_product(a, b):\n    \"\"\"Calculates the dot product of two DataFrame column vectors.\n\n    Parameters:\n    a (DataFrame): First vector as a single-column DataFrame\n    b (DataFrame): Second vector as a single-column DataFrame\n\n    Returns:\n    float: The dot product of the two vectors\n\n    Raises:\n    ValueError: If vectors have different lengths\n    \"\"\"\n\n    ",
+    "arg1": [
+        [[1], [2], [3]],
+        [[4], [5], [6]]
+    ]
 }
 
 ### codepy production endpoint
@@ -13,6 +38,6 @@ POST https://codepy.boardflare.workers.dev HTTP/1.1
 content-type: application/json
 
 {
-    "description": "Write a Python function that takes a list of integers and returns the sum of all the integers in the list",
+    "start": "Write a Python function that takes a list of integers and returns the sum of all the integers in the list",
     "arg1": [1, 2, 3, 4, 5]
 }
