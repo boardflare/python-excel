@@ -177,7 +177,7 @@
         <bt:String id="BF.TaskpaneButton.Label" DefaultValue="Python" />
         <bt:String id="BF.Group1Label" DefaultValue="PREVIEW" />
         <bt:String id="BF.GetStarted.Title" DefaultValue="Python for Excel" />
-        <bt:String id="BF.CustomFunctions.NameSpace" DefaultValue="BOARDFLARE" />
+        <bt:String id="BF.CustomFunctions.NameSpace" DefaultValue="PREVIEW" />
       </bt:ShortStrings>
       <!-- LongStrings max characters==250. -->
       <bt:LongStrings>

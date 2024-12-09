@@ -1,8 +1,6 @@
 /**
- * Welcome to Cloudflare Workers! This is your first worker.
- * env.DB is a D1 SQLite database that will persist across requests.
- *
- * Learn more at https://developers.cloudflare.com/workers/
+ * This is Cloudflare worker.
+ * env.DB is a D1 SQLite database binding.
  */
 
 const headers = {
@@ -67,7 +65,7 @@ export default {
 			const invocation = `${fname}(${numberedArgs.join(', ')})`;
 
 			// Create the prompt strings
-			const promptStart = `# Set globals\n${argAssignments}\n\n${prompt}`;
+			const promptStart = `import pandas as pd\n\n# Set globals\n${argAssignments}\n\n${prompt}`;
 			const promptSuffix = `\n\nresult = ${invocation}\nprint(result)`;
 
 			const genText = {
@@ -79,15 +77,15 @@ export default {
 				max_tokens: 1500,
 				temperature: 0.1
 			};
-			console.log("fimPrompt", fimPrompt);
+			console.log("genText", genText);
 
-			const response = await fetch('https://gateway.ai.cloudflare.com/v1/92d55664b831823cc914de02c9a0d0ae/codepy/mistral/v1/fim/completions', {
+			const response = await fetch('https://gateway.ai.cloudflare.com/v1/92d55664b831823cc914de02c9a0d0ae/codepy/mistral/v1/chat/completions', {
 				method: 'POST',
 				headers: {
 					'Authorization': `Bearer ${env.MISTRAL_API_KEY}`,
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(fimPrompt),
+				body: JSON.stringify(genText),
 			});
 
 			if (!response.ok) {
@@ -106,14 +104,14 @@ export default {
 			revisedCode = revisedCode.replace(/# Set globals[\s\S]*?\n\n/, '');
 
 			// Add results to the end of the code
-			revisedCode += "\nresult";
+			// revisedCode += "\nresult";
 
 			const text = revisedCode;
 
 			// Log LLM prompt and result to database
 			const llmData = JSON.stringify({
-				fimPrompt,
-				fimResult
+				prompt: genText,
+				result: result
 			});
 
 			const now = new Date().toISOString();
