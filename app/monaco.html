@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Python Function</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs/loader.min.js"></script>
+    <style>
+        body {
+            margin: 10px;
+        }
+
+        #editor {
+            border: 1px solid #ccc;
+            height: calc(100vh - 80px);
+            width: 100%;
+        }
+
+        .button-row {
+            margin: 10px 0;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editor"></div>
+    <div class="button-row">
+        <button id="cancelBtn">Cancel</button>
+        <button id="saveBtn">Create Function</button>
+    </div>
+
+    <script>
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs' } });
+
+        require(['vs/editor/editor.main'], function () {
+            const defaultCode = [
+                '"""Example function.',
+                '',
+                'Args:',
+                '    text: Input string',
+                '',
+                'Returns:',
+                '    Capitalized string',
+                '',
+                'Examples:',
+                '    capitalize("hello") -> "Hello"',
+                '"""',
+                'def capitalize(text):',
+                '    return text.capitalize()'
+            ].join('\n');
+
+            const editor = monaco.editor.create(document.getElementById('editor'), {
+                value: defaultCode,
+                language: 'python',
+                theme: 'vs-dark',
+                minimap: { enabled: false }
+            });
+
+            document.getElementById('saveBtn').onclick = function () {
+                Office.context.ui.messageParent(editor.getValue());
+            };
+
+            document.getElementById('cancelBtn').onclick = function () {
+                Office.context.ui.messageParent('');
+            };
+        });
+
+        Office.onReady();
+    </script>
+</body>
+
+</html>

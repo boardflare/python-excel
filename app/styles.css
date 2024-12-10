@@ -100,3 +100,11 @@ td {
 table {
     border: 1px solid black;
 }
+
+/* Monaco editor specific styles */
+#codeEditor .monaco-editor,
+#codeEditor .monaco-editor .lines-content,
+#codeEditor .monaco-editor .view-line {
+    line-height: initial !important;
+    font-size: initial !important;
+}

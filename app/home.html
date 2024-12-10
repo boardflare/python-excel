@@ -11,23 +11,29 @@
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .block {
+            position: relative;
+            min-height: 30px;
+        }
+    </style>
 </head>
 
 <body>
     <div class="sidebar branding-below">
         <div class="block">
             <div class="block">
-                Run Python as a function. PREVIEW 🚧<br />
-                See <a target="_blank" rel=noopener
+                Run Python as a function. See <a target="_blank" rel=noopener
                     href="https://www.boardflare.com/apps/excel/python">documentation</a>
                 and <a target="_blank" rel=noopener
                     href="https://whistlernetworks.sharepoint.com/:x:/s/Boardflare/EZ3eKR1wcltImmG2OA4sX-kB8RSA2cvJFM-hPoQGGdwMmA?e=m0eFdd">demo
-                    workbook</a>.<br />
-                <code>=BOARDFLARE.RUNPY("arg1 + 2", 3)</code><br />
+                    workbook</a>. e.g. <code>=BOARDFLARE.RUNPY("arg1 + 2", 3)</code><br />
                 <details open>
                     <summary>Create Functions</summary>
-                    <button type="button" id="addFunctionsSheet">Add functions sheet</button>
-                    <button type="button" id="createNewFunction">Create new function</button>
+                    <div class="block">
+                        <button type="button" id="addFunctionsSheet">Add functions sheet</button>
+                        <button type="button" id="createNewFunction">Create new function</button>
+                    </div>
                 </details>
             </div>
             <div class="block">

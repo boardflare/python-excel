@@ -137,5 +137,79 @@ async function addFunctionsSheet() {
 }
 
 async function createNewFunction() {
-    // for AI function creation
+    Office.context.ui.displayDialogAsync('https://localhost:4000/monaco.html',
+        { height: 60, width: 50 },
+        function (result) {
+            if (result.status === Office.AsyncResultStatus.Failed) {
+                console.error(`Dialog failed: ${result.error.message}`);
+                return;
+            }
+
+            // Store dialog instance
+            const dialog = result.value;
+            dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
+                const code = arg.message;
+                if (code) {
+                    parseAndCreateFunction(code);
+                    dialog.close();
+                }
+            });
+        }
+    );
+}
+
+function parsePythonCode(code) {
+    try {
+        const functionMatch = code.match(/def\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\((.*?)\):/);
+        if (!functionMatch) throw new Error("No function definition found");
+
+        const functionName = functionMatch[1].toUpperCase();
+        const signature = `${functionName}(${functionMatch[2]})`;
+
+        const docstringMatch = code.match(/"""([\s\S]*?)"""/);
+        if (!docstringMatch) throw new Error("No docstring found");
+
+        const docstring = docstringMatch[1];
+        const description = docstring.split('\n')[0].trim();
+        const args = docstring.match(/Args:([\s\S]*?)(?=Returns:|$)/)?.[1]?.trim() || '';
+        const returns = docstring.match(/Returns:([\s\S]*?)(?=Examples:|$)/)?.[1]?.trim() || '';
+        const examples = docstring.match(/Examples:([\s\S]*?)$/)?.[1]?.trim() || '';
+
+        return {
+            name: functionName,
+            signature,
+            code,
+            description,
+            args,
+            returns,
+            examples
+        };
+    } catch (error) {
+        throw new Error(`Failed to parse Python code: ${error.message}`);
+    }
+}
+
+async function parseAndCreateFunction(code) {
+    const progress = document.getElementById('progress');
+    try {
+        const entityData = parsePythonCode(code);
+
+        await Excel.run(async (context) => {
+            const sheet = context.workbook.worksheets.getItem("Functions");
+            const table = sheet.tables.getItem("PythonFunctions");
+
+            const range = table.rows.add(null, [createEntityFromNotebookData(entityData)]);
+            await context.sync();
+        });
+
+        progress.textContent = "Function created successfully!";
+        progress.style.color = "green";
+    } catch (error) {
+        progress.textContent = error.message;
+        progress.style.color = "red";
+    }
+
+    setTimeout(() => {
+        progress.textContent = "";
+    }, 3000);
 }
