@@ -38,16 +38,28 @@ async function addNamedFunctions(examples) {
         console.log('Adding:', ex.name, formula);
 
         await Excel.run(async (context) => {
+            // Delete existing named item if it exists
+            const existingItem = context.workbook.names.getItemOrNullObject(ex.name);
+            await context.sync();
+
+            if (existingItem.isNullObject === false) {
+                existingItem.delete();
+            }
+
             const namedItem = context.workbook.names.add(ex.name, formula);
             namedItem.visible = true;
 
-            if (ex.docstring) {
-                namedItem.comment = ex.docstring.trim().substring(0, 255);
+            if (ex.description) {
+                namedItem.comment = ex.description.trim().substring(0, 255);
             }
 
             await context.sync();
         });
     }
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export async function addFunctionsSheet() {
@@ -57,36 +69,48 @@ export async function addFunctionsSheet() {
     }
     console.log('Examples:', examples);
 
-    const tableRows = examples.map(ex => [
+    await addNamedFunctions(examples);
+
+    const headerRow = [["Function", "Description", "Code", "Example"]];
+    const dataRows = examples.map(ex => [
         ex.signature,
         ex.description,
         null,
         ex.example ? `=${ex.name}("${ex.example}")` : ''
     ]);
-    console.log('Table rows to be added:', tableRows);
 
     await Excel.run(async (context) => {
         context.workbook.worksheets.getItemOrNullObject("Python_Demo").delete();
         let sheet = context.workbook.worksheets.add("Python_Demo");
 
-        // Create table and header
-        const functionsTable = sheet.tables.add("A1:D1", true);
-        functionsTable.name = "PythonFunctions";
-        functionsTable.getHeaderRowRange().values = [["Function", "Description", "Code", "Example"]];
+        // Add header and data
+        const numColumns = 4; // A through D
+        const endRow = dataRows.length + 1; // +1 for header row
+        const dataRange = sheet.getRangeByIndexes(0, 0, endRow, numColumns);
+        dataRange.values = [...headerRow, ...dataRows];
 
-        // Add data to table using prepared rows
-        functionsTable.rows.add(null, tableRows);
+        // Convert range to table
+        const table = sheet.tables.add(dataRange, true);
+        table.style = "TableStyleMedium2";
+        table.name = "PythonFunctionsTable";
 
-        // Format columns before adding entities
-        sheet.getUsedRange().format.autofitColumns();
-        sheet.getUsedRange().format.autofitRows();
+        // Format columns
+        table.columns.load("items");
+        await context.sync();
 
-        // Add code entities only to the Code column
-        const codeColumn = functionsTable.columns.getItem("Code");
-        codeColumn.getDataBodyRange().valuesAsJson = examples.map(ex => createEntity(ex));
-        codeColumn.getRange().format.autofitColumns();
+        // Add code entities to the Code column (C column)
+        const codeRange = sheet.getRange("C2:C" + endRow);
+        codeRange.valuesAsJson = examples.map(ex => createEntity(ex));
+
+        // Initial autofit
+        table.getRange().format.autofitColumns();
 
         sheet.activate();
+        await context.sync();
+
+        // Wait 2 seconds and autofit again
+        await delay(2000);
+        table.getRange().format.autofitColumns();
         await context.sync();
     });
 }
