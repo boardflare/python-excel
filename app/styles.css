@@ -8,8 +8,9 @@ body {
     top: 0;
 }
 
-code {
-    color: darkgreen;
+.block {
+    position: relative;
+    min-height: 30px;
 }
 
 .footer-container {
@@ -23,30 +24,13 @@ code {
     vertical-align: middle;
 }
 
-#accountDetails {
-    display: none;
-}
-
 #cancelButton {
     margin: 0.5rem;
 }
 
-#credits {
-    font-weight: bold;
-    margin: 0.5rem;
-}
-
-#email {
-    width: 100%;
-}
-
-#fallback-login {
-    display: none;
-    margin: 0.5rem;
-}
-
-#feedback {
-    width: 100%;
+/* Add padding to anchor buttons to match regular buttons */
+a.button {
+    padding: 0 0.8em;
 }
 
 #progress {
@@ -55,56 +39,11 @@ code {
     align-items: flex-start;
 }
 
-#referralForm input[type="submit"] {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 10px 15px;
-}
-
-#referralForm input[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-#referralForm input[type="text"] {
-    box-sizing: border-box;
-    margin-bottom: 10px;
-    padding: 8px;
-    width: 100%;
-}
-
-#referralForm label {
-    margin-bottom: 5px;
-}
-
-#submitFeedback {
-    margin-top: 5px;
-}
-
-.referral-block {
-    display: none;
-}
-
-.sidebar span {
-    display: block;
-    margin-top: 0.5rem;
-}
-
-summary,
-th,
-td {
+summary {
     padding: 3px;
 }
 
-table {
-    border: 1px solid black;
-}
-
-/* Monaco editor specific styles */
-#codeEditor .monaco-editor,
-#codeEditor .monaco-editor .lines-content,
-#codeEditor .monaco-editor .view-line {
-    line-height: initial !important;
-    font-size: initial !important;
+#main-buttons button,
+#main-buttons a.button {
+    margin: 0 0.3em;
 }

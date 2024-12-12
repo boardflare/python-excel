@@ -36,25 +36,16 @@
 
         require(['vs/editor/editor.main'], function () {
             const defaultCode = [
-                '"""Example function.',
-                '',
-                'Args:',
-                '    text: Input string',
-                '',
-                'Returns:',
-                '    Capitalized string',
-                '',
-                'Examples:',
-                '    foo("hello") -> "Hello"',
-                '"""',
                 'def foo(text):',
-                '    return text.capitalize()'
+                '    return text.capitalize()',
+                'foo(arg1)',
             ].join('\n');
 
             const editor = monaco.editor.create(document.getElementById('editor'), {
                 value: defaultCode,
                 language: 'python',
                 theme: 'vs-dark',
+                fontSize: 16,
                 minimap: { enabled: false }
             });
 

@@ -1,5 +1,7 @@
 import { abortController } from "./utils/common.js";
 import { sendFeedback } from "./utils/feedback.js";
+import { addFunctionsSheet } from "./add/demo.js";
+import { createNewFunction } from "./editor/create.js";
 
 window.appName = 'Python';
 
@@ -40,7 +42,7 @@ async function initializeBrowserInfo() {
     }
 }
 
-// Add elements to the DOM
+// Setup page on load
 document.addEventListener('DOMContentLoaded', async function () {
     await initializeBrowserInfo();
 
@@ -56,4 +58,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             location.reload();
         }, 500);
     });
+});
+
+// Add button handlers when Office is ready
+Office.onReady(() => {
+    document.getElementById("addFunctionsSheet").onclick = addFunctionsSheet;
+    document.getElementById("createNewFunction").onclick = createNewFunction;
 });

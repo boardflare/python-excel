@@ -43,3 +43,17 @@ content-type: application/json
         [["New York"]]
     ]
 }
+
+### Create anonymous GitHub gist
+POST https://api.github.com/gists
+Content-Type: application/json
+
+{
+    "description": "Example code snippet",
+    "public": true,
+    "files": {
+        "code.py": {
+            "content": "def hello_world():\n    print('Hello, World!')"
+        }
+    }
+}
