@@ -64,4 +64,43 @@ document.addEventListener('DOMContentLoaded', async function () {
 Office.onReady(() => {
     document.getElementById("addFunctionsSheet").onclick = addFunctionsSheet;
     document.getElementById("createNewFunction").onclick = createNewFunction;
+    document.getElementById("openJupyter").onclick = openJupyterDialog;
+    document.getElementById("getKey").onclick = listDatabases;
 });
+
+function openJupyterDialog() {
+    Office.context.ui.displayDialogAsync(
+        'https://addins.boardflare.com/jupyterlite/prod/jupyterlite/lab/index.html',
+        { height: 80, width: 70 },
+        function (result) {
+            if (result.status === Office.AsyncResultStatus.Failed) {
+                console.error(`Dialog failed: ${result.error.message}`);
+            }
+        }
+    );
+}
+
+async function listDatabases() {
+    try {
+        // Get all databases
+        const databases = await window.indexedDB.databases();
+        console.log('Available IndexedDB databases:', databases);
+
+        // For each database, attempt to open and list contents
+        for (const db of databases) {
+            const request = indexedDB.open(db.name);
+            request.onsuccess = function (event) {
+                const db = event.target.result;
+                const objectStoreNames = Array.from(db.objectStoreNames);
+                console.log(`Database: ${db.name}`);
+                console.log('Object stores:', objectStoreNames);
+                db.close();
+            };
+            request.onerror = function (event) {
+                console.error(`Error opening database ${db.name}:`, event.target.error);
+            };
+        }
+    } catch (error) {
+        console.error('Error listing databases:', error);
+    }
+}
