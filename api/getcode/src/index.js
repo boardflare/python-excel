@@ -1,6 +1,6 @@
 // Cloudflare Worker to fetch a code by timestamp from Azure Table Storage
 
-import { getCodeFromTable } from './tables.js';
+import { getUserCode, getAnonCode } from './tables.js';
 
 const headers = {
 	'Access-Control-Allow-Origin': '*'
@@ -21,13 +21,21 @@ export default {
 			const url = new URL(request.url);
 			console.log('URL:', url);
 			const decodedPath = decodeURIComponent(url.pathname.slice(1));
-			const [partitionKey, rowKey] = decodedPath.split('|');
+			const [uid, func, timestamp] = decodedPath.split('|');
 
-			if (!partitionKey || !rowKey) {
-				throw new Error('Invalid key format. Use: /partitionKey|rowKey');
+			if (!uid || !func || !timestamp) {
+				throw new Error('Invalid key format. Use: /uid|function|timestamp');
 			}
+			console.log('UID:', uid, 'Function:', func, 'Timestamp:', timestamp);
 
-			const entity = await getCodeFromTable(env, partitionKey, rowKey);
+			let entity;
+			if (uid.startsWith('ANON:')) {
+				// For anonymous: PK=timestamp, RK=uid|function
+				entity = await getAnonCode(env, timestamp, `${uid}|${func}`);
+			} else {
+				// For users: PK=uid, RK=function|timestamp
+				entity = await getUserCode(env, uid, `${func}|${timestamp}`);
+			}
 
 			if (!entity) {
 				throw new Error('Entity not found');
