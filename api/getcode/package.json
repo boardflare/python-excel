@@ -1,0 +1,21 @@
+{
+  "name": "getcode",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --local-protocol https",
+    "start": "wrangler dev",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.5.36",
+    "vitest": "2.0.5",
+    "wrangler": "^3.60.3"
+  },
+  "dependencies": {
+    "@ai-sdk/mistral": "^1.0.5",
+    "@azure/data-tables": "^13.3.0",
+    "ai": "^4.0.16"
+  }
+}

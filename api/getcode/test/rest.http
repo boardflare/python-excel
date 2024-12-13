@@ -1,0 +1,62 @@
+### codepy local endpoint
+POST https://localhost:8787 HTTP/1.1
+content-type: application/json
+
+{
+    "prompt": "import pandas as pd\n\ndef dot_product(a, b):\n    \"\"\"Calculates the dot product of two DataFrame column vectors.",
+    "arg1": [
+        [[1], [2], [3]],
+        [[4], [5], [6]]
+    ]
+}
+
+### codepy local endpoint
+POST https://localhost:8787 HTTP/1.1
+content-type: application/json
+
+{
+    "prompt": "import requests\n\ndef get_weather(city):\n    \"\"\"Calls a public weather api to get the current weather for a city in the US.",
+    "arg1": [
+        [["New York"]]
+    ]
+}
+
+### codepy local endpoint
+POST https://localhost:8787 HTTP/1.1
+content-type: application/json
+
+{
+    "prompt": "import pandas as pd\n\ndef dot_product(a, b):\n    \"\"\"Calculates the dot product of two DataFrame column vectors.\n\n    Parameters:\n    a (DataFrame): First vector as a single-column DataFrame\n    b (DataFrame): Second vector as a single-column DataFrame\n\n    Returns:\n    float: The dot product of the two vectors\n\n    Raises:\n    ValueError: If vectors have different lengths\n    \"\"\"\n\n    ",
+    "arg1": [
+        [[1], [2], [3]],
+        [[4], [5], [6]]
+    ]
+}
+
+### codepy production endpoint
+POST https://codepy.boardflare.workers.dev HTTP/1.1
+content-type: application/json
+
+{
+    "prompt": "import requests\n\ndef get_weather(city):\n    \"\"\"Calls a public weather api to get the current weather for a city in the US.",
+    "arg1": [
+        [["New York"]]
+    ]
+}
+
+### Create anonymous GitHub gist
+POST https://api.github.com/gists
+Content-Type: application/json
+
+{
+    "description": "Example code snippet",
+    "public": true,
+    "files": {
+        "code.py": {
+            "content": "def hello_world():\n    print('Hello, World!')"
+        }
+    }
+}
+
+### Test local code retrieval
+GET http://localhost:8787/foo|bar HTTP/1.1

@@ -2,7 +2,7 @@ import { parsePython } from '../utils/codeparser.js';
 
 export async function createNewFunction() {
     Office.context.ui.displayDialogAsync('https://localhost:4000/editor/monaco.html',
-        // { height: 60, width: 50 },
+        { height: 80, width: 80 },
         function (result) {
             if (result.status === Office.AsyncResultStatus.Failed) {
                 console.error(`Dialog failed: ${result.error.message}`);
