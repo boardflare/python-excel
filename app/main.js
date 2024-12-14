@@ -1,5 +1,4 @@
 import { abortController } from "./utils/common.js";
-import { addFunctionsSheet } from "./add/demo.js";
 import { createNewFunction } from "./editor/create.js";
 
 window.appName = 'Python';

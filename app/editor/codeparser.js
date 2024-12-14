@@ -20,7 +20,8 @@ export function parsePython(rawCode) {
 
     // Extract example
     const exampleMatch = rawCode.match(/^#?\s*example\s*=\s*["'](.+?)["']/m);
-    const example = exampleMatch ? exampleMatch[1] : 'No example set in code';
+    // const example = exampleMatch ? exampleMatch[1] : 'No example set in code';
+    const arg1 = "this";
 
     // Generate result string
     const argList = args.map((_, index) => `arg${index + 1}`).join(', ');
@@ -38,18 +39,19 @@ export function parsePython(rawCode) {
     const escapedCode = code.replace(/"/g, '""');
     const signature = `${name}(${params})`;
     const formula = `=LAMBDA(${params}, ${runpyEnv}("${escapedCode}", ${params}))`;
-    const runpy = `=${runpyEnv}("${escapedCode}", [@Example])`;
-    const lambda = `=${formula}([@Example])`;
-    const named = `=${name}([@Example])`;
+    const runpy = `=${runpyEnv}("${escapedCode}", [@Arg1])`;
+    const lambda = `${formula}([@Arg1])`;
+    const named = `=${name}([@Arg1])`;
 
     return {
         name,
         signature,
         description,
         code,
-        example,
+        arg1,
         runpy,
         lambda,
-        named
+        named,
+        formula
     };
 }

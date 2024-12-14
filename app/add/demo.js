@@ -1,4 +1,4 @@
-import { parsePython } from '../utils/codeparser.js';
+import { parsePython } from '../editor/codeparser.js';
 
 async function getExamplesFromNotebook() {
     try {
