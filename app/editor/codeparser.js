@@ -39,7 +39,7 @@ export function parsePython(rawCode) {
     const escapedCode = code.replace(/"/g, '""');
     const signature = `${name}(${params})`;
     const formula = `=LAMBDA(${params}, ${runpyEnv}(INDEX(Functions[Code],1), ${params}))`;
-    const runpy = `=${runpyEnv}(INDEX(Functions[Code],1), [@Arg1])`;
+    const runpy = `=${runpyEnv}(Functions[@Code], [@Arg1])`;
     const lambda = `${formula}([@Arg1])`;
     const named = `=${name}([@Arg1])`;
 

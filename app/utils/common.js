@@ -10,7 +10,7 @@ export async function queueTask(args, task) {
         return await queue.add(async ({ signal }) => {
             const request = task(args);
             signal.addEventListener('abort', () => {
-                worker.terminate();
+                pyworker.terminate();
                 abortController.abort();
             });
 

@@ -29,15 +29,15 @@ export async function updateFunctionSheet(parsedCode) {
             sheet.activate();
             const table = sheet.tables.getItem("Functions");
 
-            // Add new row with values
+            // Add new row with values and formulas
             const newRow = [[
                 parsedCode.signature,
                 parsedCode.description,
                 parsedCode.code,
                 parsedCode.arg1,
-                "",  // Will be set by formula
-                "",  // Will be set by formula
-                ""   // Will be set by formula
+                parsedCode.runpy,
+                parsedCode.lambda,
+                parsedCode.named
             ]];
 
             table.rows.add(null, newRow);
@@ -60,21 +60,6 @@ export async function updateFunctionSheet(parsedCode) {
             if (parsedCode.description) {
                 namedItem.comment = parsedCode.description;
             }
-            await context.sync();
-
-            // Get the range for the newly added row's formula cells
-            const tableRange = table.getRange();
-            tableRange.load("rowCount");
-            await context.sync();
-
-            const newRowIndex = tableRange.rowCount;
-            const formulaRange = sheet.getRange(`E${newRowIndex}:G${newRowIndex}`);
-            formulaRange.formulas = [[
-                parsedCode.runpy,
-                parsedCode.lambda,
-                parsedCode.named
-            ]];
-
             await context.sync();
 
             // Create cell link inline
