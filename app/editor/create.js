@@ -1,7 +1,16 @@
-import { parsePython } from '../utils/codeparser.js';
+import { parsePython } from './codeparser.js';
+import { updateNameManager } from './nameManager.js';
+import { updateFunctionSheet } from './functionSheet.js';
+
+const progress = document.getElementById('progress');
 
 export async function createNewFunction() {
-    Office.context.ui.displayDialogAsync('https://localhost:4000/editor/monaco.html',
+    // Get current URL and replace the last part with editor/monaco.html
+    const currentUrl = window.location.href;
+    const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
+    const dialogUrl = `${baseUrl}/editor/monaco.html`;
+
+    Office.context.ui.displayDialogAsync(dialogUrl,
         { height: 80, width: 80 },
         function (result) {
             if (result.status === Office.AsyncResultStatus.Failed) {
@@ -11,7 +20,7 @@ export async function createNewFunction() {
             const dialog = result.value;
             dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
                 if (arg.message) {
-                    parseAndCreateFunction(arg.message);
+                    addFunction(arg.message);
                     dialog.close();
                 }
             });
@@ -19,51 +28,25 @@ export async function createNewFunction() {
     );
 }
 
-async function parseAndCreateFunction(code) {
-    const progress = document.getElementById('progress');
-
+// Add function to worksheet and name manager
+async function addFunction(code) {
     try {
-        console.log('Code:', code);
-        const entityData = parsePython(code);
-        console.log('Parsed entity:', entityData);
+        const parsedCode = parsePython(code);
+        console.log('parsedCode:', parsedCode);
 
-        // Extract params outside Excel.run
-        const params = entityData.signature
-            .match(/\((.*?)\)/)?.[1]
-            ?.split(',')
-            .map(p => p.trim())
-            .join(',') || '';
+        if (parsedCode.error) {
+            progress.textContent = parsedCode.error;
+            progress.style.color = "orange";
+            return;
+        }
 
-        // Get docstring but don't remove from code
-        const docstring = entityData.docstring || '';
+        // Update name manager
+        await updateNameManager(parsedCode);
 
-        console.log('Params:', params);
+        // Update demo worksheet
+        await updateFunctionSheet(parsedCode);
 
-        await Excel.run(async (context) => {
-            // Create lambda formula with inline quote escaping
-            const formula = `=LAMBDA(${params}, PREVIEW.RUNPY("${entityData.code.replace(/"/g, '""')}", ${params}))`;
-
-            if (formula.length > 8190) {
-                throw new Error("Function code is too long. Excel named formulas are limited to 8190 characters.  Either reduce the size of the function or consider using a GitHub Gist to store function.");
-            }
-
-            console.log('Formula:', formula);
-            console.log('Function:', entityData.name);
-
-            // Add or update the name in the workbook
-            const namedItem = context.workbook.names.add(entityData.name, formula);
-            namedItem.visible = true;
-            console.log('Docstring:', docstring);
-
-            // Store truncated docstring as comment if present
-            if (docstring) {
-                namedItem.comment = docstring.trim().substring(0, 255);
-            }
-
-            await context.sync();
-        });
-
-        progress.textContent = "Function saved to Name Manager successfully!";
+        progress.textContent = "Function saved successfully!";
         progress.style.color = "green";
     } catch (error) {
         progress.textContent = error.message;
