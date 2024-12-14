@@ -10,17 +10,17 @@ export async function updateFunctionSheet(parsedCode) {
                 await context.sync();
 
                 // Updated column widths
-                sheet.getRange("A:A").format.columnWidth = 75;  // Function
+                sheet.getRange("A:A").format.columnWidth = 100;  // Function
                 sheet.getRange("B:B").format.columnWidth = 150;  // Description
-                sheet.getRange("C:C").format.columnWidth = 75;  // Code
+                sheet.getRange("C:C").format.columnWidth = 300;  // Code
                 sheet.getRange("D:D").format.columnWidth = 100;  // Arg1
-                sheet.getRange("E:E").format.columnWidth = 100;   // RUNPY
-                sheet.getRange("F:F").format.columnWidth = 120;   // LAMBDA
-                sheet.getRange("G:G").format.columnWidth = 120;  // NAMED
+                sheet.getRange("E:E").format.columnWidth = 100;  // RUNPY
+                sheet.getRange("F:F").format.columnWidth = 100;  // LAMBDA
+                sheet.getRange("G:G").format.columnWidth = 100;  // NAMED
                 await context.sync();  // Ensure widths are applied
 
                 const headerRange = sheet.getRange("A1:G1");
-                headerRange.values = [["Function", "Description", "Python", "Arg1", "RUNPY", "LAMBDA", "NAMED LAMBDA"]];
+                headerRange.values = [["Function", "Description", "Code", "Arg1", "RUNPY", "LAMBDA", "NAMED LAMBDA"]];
                 const table = sheet.tables.add(headerRange, true);
                 table.name = "Functions";
                 await context.sync();
@@ -33,7 +33,7 @@ export async function updateFunctionSheet(parsedCode) {
             const newRow = [[
                 parsedCode.signature,
                 parsedCode.description,
-                null,
+                parsedCode.code,
                 parsedCode.arg1,
                 parsedCode.runpy,
                 parsedCode.lambda,
@@ -47,27 +47,12 @@ export async function updateFunctionSheet(parsedCode) {
 
             await context.sync();
 
-            const codeCell = sheet.getRange(`C${tableRange.rowCount}`);
-            codeCell.valuesAsJson = [[{
-                type: Excel.CellValueType.entity,
-                text: parsedCode.name,
-                properties: {
-                    "Code": { type: "String", basicValue: parsedCode.code || "Not available" }
-                },
-                layouts: {
-                    compact: { icon: Excel.EntityCompactLayoutIcons.code },
-                },
-                provider: {
-                    "description": "Boardflare"
-                },
-            }]];
-
-            // await context.sync();
-
-            // const namedLambdaCell = sheet.getRange(`G${tableRange.rowCount}`);
-            // namedLambdaCell.formulas = [["=[@Example]"]];
+            // Create cell link inline
+            const url = Office.context.document.url;
 
             await context.sync();
+            console.log("Workbook URL:", url);
+
         } catch (error) {
             console.error("Excel API Error:", error);
             throw error;
