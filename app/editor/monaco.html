@@ -37,11 +37,9 @@
         require(['vs/editor/editor.main'], function () {
             const defaultCode = [
                 'def foo(text):',
-                '    """',
-                '    This is a sample function.',
-                '    """',
+                '    """ This is a sample function. """',
+                '    print(text)',
                 '    return text.capitalize()',
-                'example = "hello, world!"',
             ].join('\n');
 
             const editor = monaco.editor.create(document.getElementById('editor'), {

@@ -38,8 +38,8 @@ export function parsePython(rawCode) {
     // Create lambda formula with dynamic runpy environment and table references
     const escapedCode = code.replace(/"/g, '""');
     const signature = `${name}(${params})`;
-    const formula = `=LAMBDA(${params}, ${runpyEnv}("${escapedCode}", ${params}))`;
-    const runpy = `=${runpyEnv}("${escapedCode}", [@Arg1])`;
+    const formula = `=LAMBDA(${params}, ${runpyEnv}(INDEX(Functions[Code],1), ${params}))`;
+    const runpy = `=${runpyEnv}(INDEX(Functions[Code],1), [@Arg1])`;
     const lambda = `${formula}([@Arg1])`;
     const named = `=${name}([@Arg1])`;
 

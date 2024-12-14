@@ -41,7 +41,7 @@ async function addFunction(code) {
         }
 
         // Update name manager
-        await updateNameManager(parsedCode);
+        // await updateNameManager(parsedCode);
 
         // Update demo worksheet
         await updateFunctionSheet(parsedCode);

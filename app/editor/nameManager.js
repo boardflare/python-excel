@@ -12,22 +12,25 @@ export async function updateNameManager(parsedCode) {
     }
 
     return Excel.run(async (context) => {
-        // Check if name already exists and delete it
+        let namedItem;
+
+        // Try to get existing name
         try {
-            const existingItem = context.workbook.names.getItem(parsedCode.name);
-            existingItem.delete();
+            namedItem = context.workbook.names.getItem(parsedCode.name);
             await context.sync();
+
+            // Update existing name
+            namedItem.formula = parsedCode.formula;
         } catch (error) {
-            // Name doesn't exist, continue with creation
-            if (error.code !== 'ItemNotFound') {
+            // Create new name if it doesn't exist
+            if (error.code === 'ItemNotFound') {
+                namedItem = context.workbook.names.add(parsedCode.name, parsedCode.formula);
+            } else {
                 throw error;
             }
         }
 
-        // Add or update the name in the workbook
-        const namedItem = context.workbook.names.add(parsedCode.name, parsedCode.formula);
         namedItem.visible = true;
-
         if (parsedCode.description) {
             namedItem.comment = parsedCode.description;
         }

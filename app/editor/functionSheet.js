@@ -17,7 +17,7 @@ export async function updateFunctionSheet(parsedCode) {
                 sheet.getRange("E:E").format.columnWidth = 100;  // RUNPY
                 sheet.getRange("F:F").format.columnWidth = 100;  // LAMBDA
                 sheet.getRange("G:G").format.columnWidth = 100;  // NAMED
-                await context.sync();  // Ensure widths are applied
+                await context.sync();
 
                 const headerRange = sheet.getRange("A1:G1");
                 headerRange.values = [["Function", "Description", "Code", "Arg1", "RUNPY", "LAMBDA", "NAMED LAMBDA"]];
@@ -27,29 +27,58 @@ export async function updateFunctionSheet(parsedCode) {
             }
 
             sheet.activate();
-
-            // Get table and add new row
             const table = sheet.tables.getItem("Functions");
+
+            // Add new row with values
             const newRow = [[
                 parsedCode.signature,
                 parsedCode.description,
                 parsedCode.code,
                 parsedCode.arg1,
+                "",  // Will be set by formula
+                "",  // Will be set by formula
+                ""   // Will be set by formula
+            ]];
+
+            table.rows.add(null, newRow);
+            await context.sync();
+
+            // Add or update name manager entry
+            let namedItem;
+            try {
+                namedItem = context.workbook.names.getItem(parsedCode.name);
+                await context.sync();
+                namedItem.formula = parsedCode.formula;
+            } catch (error) {
+                if (error.code === 'ItemNotFound') {
+                    namedItem = context.workbook.names.add(parsedCode.name, parsedCode.formula);
+                } else {
+                    throw error;
+                }
+            }
+            namedItem.visible = true;
+            if (parsedCode.description) {
+                namedItem.comment = parsedCode.description;
+            }
+            await context.sync();
+
+            // Get the range for the newly added row's formula cells
+            const tableRange = table.getRange();
+            tableRange.load("rowCount");
+            await context.sync();
+
+            const newRowIndex = tableRange.rowCount;
+            const formulaRange = sheet.getRange(`E${newRowIndex}:G${newRowIndex}`);
+            formulaRange.formulas = [[
                 parsedCode.runpy,
                 parsedCode.lambda,
                 parsedCode.named
             ]];
-            table.rows.add(null, newRow);
-
-            // Update the code and named lambda columns with entity
-            const tableRange = table.getRange();
-            tableRange.load("rowCount");
 
             await context.sync();
 
             // Create cell link inline
             const url = Office.context.document.url;
-
             await context.sync();
             console.log("Workbook URL:", url);
 
