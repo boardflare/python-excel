@@ -57,3 +57,15 @@ Content-Type: application/json
         }
     }
 }
+
+### Test local code retrieval
+GET http://localhost:8787/ANON:mycid|myfunc|mytimestamp HTTP/1.1
+
+### Test remote code retrieval
+GET https://getcode.boardflare.workers.dev/ANON:mycid|myfunc|mytimestamp HTTP/1.1
+
+### Test local code retrieval
+GET http://localhost:8787/myuid|myfunc|mytimestamp HTTP/1.1
+
+### Test remote code retrieval
+GET https://getcode.boardflare.workers.dev/myuid|myfunc|mytimestamp HTTP/1.1

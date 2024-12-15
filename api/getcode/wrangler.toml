@@ -1,0 +1,12 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "getcode"
+main = "src/index.js"
+compatibility_date = "2024-11-06"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "getcode"

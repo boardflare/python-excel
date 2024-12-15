@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Python Function</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs/loader.min.js"></script>
+    <style>
+        body {
+            margin: 10px;
+        }
+
+        #editor {
+            border: 1px solid #ccc;
+            height: calc(100vh - 80px);
+            width: 100%;
+        }
+
+        .button-row {
+            margin: 10px 0;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Add a dropdown for selecting functions -->
+    <select id="functionDropdown">
+        <!-- Options will be populated dynamically -->
+    </select>
+    <div id="editor"></div>
+    <div class="button-row">
+        <button id="cancelBtn">Cancel</button>
+        <button id="saveBtn">Create Function</button>
+    </div>
+
+    <script>
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs' } });
+
+        Office.onReady().then(() => {
+            require(['vs/editor/editor.main'], function () {
+                const defaultCode = [
+                    'def foo(text):',
+                    '    """ This is a sample function. """',
+                    '    print(text)',
+                    '    return text.capitalize()',
+                ].join('\n');
+
+                const editor = monaco.editor.create(document.getElementById('editor'), {
+                    value: defaultCode,
+                    language: 'python',
+                    theme: 'vs-dark',
+                    fontSize: 16,
+                    minimap: { enabled: false }
+                });
+
+                // Request the list of functions from the parent page
+                Office.context.ui.messageParent(JSON.stringify({ action: 'getFunctionsList' }));
+
+                // Remove window event listener and use Office dialog messaging
+                Office.context.ui.addHandlerAsync(
+                    Microsoft.Office.WebExtension.EventType.DialogParentMessageReceived,
+                    function (arg) {
+                        console.log('Dialog received message:', arg);
+                        try {
+                            if (!arg.message) return;
+                            const message = JSON.parse(arg.message);
+                            console.log('Parsed message in dialog:', message);
+
+                            if (message.type === 'functionsList') {
+                                console.log('Populating dropdown with:', message.functions);
+                                const dropdown = document.getElementById('functionDropdown');
+                                dropdown.innerHTML = '<option value="">Select a function...</option>';
+
+                                message.functions.forEach(func => {
+                                    if (func && func.name) {
+                                        const option = document.createElement('option');
+                                        option.value = func.name;
+                                        option.textContent = func.name;
+                                        dropdown.appendChild(option);
+                                    }
+                                });
+                            } else if (message.type === 'functionCode') {
+                                console.log('Setting editor code to:', message.code);
+                                editor.setValue(message.code || defaultCode);
+                            }
+                        } catch (error) {
+                            console.error('Error in dialog message handler:', error);
+                        }
+                    }
+                );
+
+                document.getElementById('functionDropdown').onchange = function () {
+                    const selectedFunction = this.value;
+                    Office.context.ui.messageParent(JSON.stringify({
+                        action: 'getFunctionCode',
+                        name: selectedFunction
+                    }));
+                };
+
+                document.getElementById('saveBtn').onclick = function () {
+                    Office.context.ui.messageParent(editor.getValue());
+                };
+
+                document.getElementById('cancelBtn').onclick = function () {
+                    Office.context.ui.messageParent('');
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>
