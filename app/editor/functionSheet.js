@@ -10,19 +10,34 @@ export async function updateFunctionSheet(parsedCode) {
                 await context.sync();
 
                 // Updated column widths
-                sheet.getRange("A:A").format.columnWidth = 100;  // Function
-                sheet.getRange("B:B").format.columnWidth = 150;  // Description
-                sheet.getRange("C:C").format.columnWidth = 300;  // Code
-                sheet.getRange("D:D").format.columnWidth = 100;  // Arg1
-                sheet.getRange("E:E").format.columnWidth = 100;  // RUNPY
-                sheet.getRange("F:F").format.columnWidth = 100;  // LAMBDA
-                sheet.getRange("G:G").format.columnWidth = 100;  // NAMED
+                sheet.getRange("A:A").format.columnWidth = 75;  // Name
+                sheet.getRange("B:B").format.columnWidth = 100;  // Signature
+                sheet.getRange("C:C").format.columnWidth = 100;  // Description
+                sheet.getRange("D:D").format.columnWidth = 300;  // Code
+                sheet.getRange("E:E").format.columnWidth = 100;  // Arg1
+                sheet.getRange("F:F").format.columnWidth = 100;  // RUNPY
+                sheet.getRange("G:G").format.columnWidth = 100;  // LAMBDA
+                sheet.getRange("H:H").format.columnWidth = 100;  // NAMED
                 await context.sync();
 
-                const headerRange = sheet.getRange("A1:G1");
-                headerRange.values = [["Function", "Description", "Code", "Arg1", "RUNPY", "LAMBDA", "NAMED LAMBDA"]];
+                const headerRange = sheet.getRange("A1:H1");
+                headerRange.values = [["Name", "Signature", "Description", "Code", "Arg1", "RUNPY", "LAMBDA", "NAMED LAMBDA"]];
                 const table = sheet.tables.add(headerRange, true);
                 table.name = "Functions";
+
+                // Add placeholder row
+                const placeholderRow = [[
+                    "Example Function",
+                    "foo",
+                    "This is a sample function description",
+                    "Your function code here",
+                    "arg1",
+                    "foo",
+                    "foo",
+                    "food"
+                ]];
+                table.rows.add(null, placeholderRow);
+
                 await context.sync();
             }
 
@@ -31,6 +46,7 @@ export async function updateFunctionSheet(parsedCode) {
 
             // Add new row with values and formulas
             const newRow = [[
+                parsedCode.name,
                 parsedCode.signature,
                 parsedCode.description,
                 parsedCode.code,
@@ -41,31 +57,15 @@ export async function updateFunctionSheet(parsedCode) {
             ]];
 
             table.rows.add(null, newRow);
-            await context.sync();
 
-            // Add or update name manager entry
-            let namedItem;
-            try {
-                namedItem = context.workbook.names.getItem(parsedCode.name);
-                await context.sync();
-                namedItem.formula = parsedCode.formula;
-            } catch (error) {
-                if (error.code === 'ItemNotFound') {
-                    namedItem = context.workbook.names.add(parsedCode.name, parsedCode.formula);
-                } else {
-                    throw error;
-                }
-            }
-            namedItem.visible = true;
-            if (parsedCode.description) {
-                namedItem.comment = parsedCode.description;
-            }
-            await context.sync();
+            // Set wrap text for all columns
+            table.getRange().format.wrapText = true;
 
-            // Create cell link inline
-            const url = Office.context.document.url;
+            // Disable wrap text for code column using direct name reference
+            const codeColumn = table.columns.getItem("Code");
+            codeColumn.getRange().format.wrapText = false;
+
             await context.sync();
-            console.log("Workbook URL:", url);
 
         } catch (error) {
             console.error("Excel API Error:", error);

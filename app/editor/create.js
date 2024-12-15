@@ -28,7 +28,6 @@ export async function createNewFunction() {
     );
 }
 
-// Add function to worksheet and name manager
 async function addFunction(code) {
     try {
         const parsedCode = parsePython(code);
@@ -37,20 +36,33 @@ async function addFunction(code) {
         if (parsedCode.error) {
             progress.textContent = parsedCode.error;
             progress.style.color = "orange";
+            clearProgress();
             return;
         }
 
-        // Update name manager
-        // await updateNameManager(parsedCode);
-
-        // Update demo worksheet
+        // Update demo worksheet 
         await updateFunctionSheet(parsedCode);
+
+        // Update name manager
+        await updateNameManager(parsedCode);
 
         progress.textContent = "Function saved successfully!";
         progress.style.color = "green";
+        clearProgress();
     } catch (error) {
         progress.textContent = error.message;
         progress.style.color = "red";
         console.error('Error saving function:', error);
+        clearProgress();
     }
+}
+
+function clearProgress() {
+    setTimeout(() => {
+        progress.textContent = '';
+    }, 3000);
+
+    setTimeout(() => {
+        progress.textContent = '';
+    }, 6000);
 }

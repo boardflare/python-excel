@@ -11,6 +11,11 @@ export async function updateNameManager(parsedCode) {
         return;
     }
 
+
+    // Create link to workbook
+    const url = Office.context.document.url;
+    console.log("Workbook URL:", url);
+
     return Excel.run(async (context) => {
         let namedItem;
 
