@@ -60,6 +60,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // Add button handlers when Office is ready
 Office.onReady(() => {
-    document.getElementById("addFunctionsSheet").onclick = addFunctionsSheet;
+    // document.getElementById("addFunctionsSheet").onclick = addFunctionsSheet;
     document.getElementById("createNewFunction").onclick = createNewFunction;
 });
