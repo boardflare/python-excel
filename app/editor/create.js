@@ -1,6 +1,6 @@
 import { parsePython } from './codeparser.js';
 import { updateNameManager } from './nameManager.js';
-import { updateFunctionSheet } from './functionSheet.js';
+import { updateFunctionsTable } from './functionsTable.js';
 
 const progress = document.getElementById('progress');
 
@@ -84,7 +84,7 @@ async function addFunction(code) {
         }
 
         // Update demo worksheet 
-        await updateFunctionSheet(parsedCode);
+        await updateFunctionsTable(parsedCode);
 
         // Update name manager
         await updateNameManager(parsedCode);

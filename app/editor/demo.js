@@ -1,4 +1,4 @@
-export async function updateFunctionSheet(parsedCode) {
+export async function createDemo(parsedCode) {
     return Excel.run(async (context) => {
         try {
             let sheet = context.workbook.worksheets.getItemOrNullObject("Boardflare");
@@ -9,7 +9,7 @@ export async function updateFunctionSheet(parsedCode) {
                 await context.sync();
 
                 // Set column widths for both tables
-                sheet.getRange("A:A").format.columnWidth = 100;  // Name
+                sheet.getRange("A:A").format.columnWidth = 100; // Name
                 sheet.getRange("B:B").format.columnWidth = 150; // Description
                 sheet.getRange("C:C").format.columnWidth = 300; // Code
                 sheet.getRange("D:D").format.columnWidth = 50;  // Empty separator
