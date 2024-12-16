@@ -30,17 +30,11 @@ export async function updateFunctionsTable(parsedCode) {
                 examplesTable.name = "Examples";
 
                 // Add placeholder rows
-                const functionsPlaceholder = [[
-                    "",
-                    "Function docstring",
-                    "Python code executed by RUNPY"
-                ]];
                 const examplesPlaceholder = [[
                     "Function signature",
                     "e.g. =FOO(\"bar\")",
                 ]];
 
-                functionsTable.rows.add(null, functionsPlaceholder);
                 examplesTable.rows.add(null, examplesPlaceholder);
 
                 await context.sync();

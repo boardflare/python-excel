@@ -1,5 +1,6 @@
 import { abortController } from "./utils/common.js";
 import { createNewFunction } from "./editor/create.js";
+import { addDemoSheet } from "./editor/demo.js";
 
 window.appName = 'Python';
 
@@ -60,6 +61,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // Add button handlers when Office is ready
 Office.onReady(() => {
-    // document.getElementById("addFunctionsSheet").onclick = addFunctionsSheet;
+    document.getElementById("addDemoSheet").onclick = addDemoSheet;
     document.getElementById("createNewFunction").onclick = createNewFunction;
 });

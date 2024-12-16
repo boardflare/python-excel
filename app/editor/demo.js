@@ -1,4 +1,4 @@
-export async function createDemo(parsedCode) {
+export async function addDemoSheet(parsedCode) {
     return Excel.run(async (context) => {
         try {
             let sheet = context.workbook.worksheets.getItemOrNullObject("Boardflare");
