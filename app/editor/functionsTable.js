@@ -12,17 +12,24 @@ export async function updateFunctionsTable(parsedCode) {
                 sheet.getRange("A:A").format.columnWidth = 100; // Name
                 sheet.getRange("B:B").format.columnWidth = 150; // Description
                 sheet.getRange("C:C").format.columnWidth = 300; // Code
+                sheet.getRange("D:D").format.columnWidth = 150; // Usage
                 await context.sync();
 
                 // Add title cell and merge
-                const titleRange = sheet.getRange("A1:C1");
+                const titleRange = sheet.getRange("A1:D1");
+                titleRange.values = [["⚠️ WARNING ⚠️:  The table below is used to store your functions. DO NOT EDIT IT DIRECTLY.  It is protected to help prevent you from doing this by accident.  If you decide to ignore this and corrupt it by mistake, you will need to restore it yourself from the OneDrive version history or some other backup.  The add-in has no ability to fix it.", "", "", ""]];
+                titleRange.format.horizontalAlignment = "left";
+                titleRange.format.verticalAlignment = "top";
                 titleRange.merge();
-                titleRange.values = [["Table info here", "", ""]];
                 titleRange.format.wrapText = true;
+                titleRange.format.font.size = 13;
+                titleRange.format.fill.color = "yellow";
+                titleRange.format.rowHeight = 60;
+                await context.sync();
 
                 // Create Functions table
-                const functionsHeaderRange = sheet.getRange("A2:C2");
-                functionsHeaderRange.values = [["Name", "Description", "Code"]];
+                const functionsHeaderRange = sheet.getRange("A2:D2");
+                functionsHeaderRange.values = [["Name", "Description", "Code", "Usage"]];
                 const functionsTable = sheet.tables.add(functionsHeaderRange, true);
                 functionsTable.name = "Boardflare_Functions";
 
@@ -43,13 +50,19 @@ export async function updateFunctionsTable(parsedCode) {
             const functionsRow = [[
                 parsedCode.name,
                 parsedCode.description,
-                parsedCode.code
+                parsedCode.code,
+                parsedCode.signature
             ]];
 
             functionsTable.rows.add(null, functionsRow);
 
             // Set wrap text for all columns except code
             functionsTable.getRange().format.wrapText = true;
+            functionsTable.getRange().format.verticalAlignment = "top";
+
+            // Set row height only for data rows
+            const dataRange = functionsTable.getDataBodyRange();
+            dataRange.format.rowHeight = 100;
 
             await context.sync();
 

@@ -87,7 +87,7 @@ async function addFunction(code) {
         // Update functions worksheet and demo worksheet
         await Promise.all([
             updateFunctionsTable(parsedCode),
-            updateDemoTable(parsedCode),
+            //updateDemoTable(parsedCode),
             updateNameManager(parsedCode)
         ]);
 
@@ -105,7 +105,17 @@ async function addFunction(code) {
 async function getFunctionsList() {
     try {
         const context = new Excel.RequestContext();
-        const table = context.workbook.tables.getItem('Boardflare_Functions');
+
+        // Check if table exists first
+        const tables = context.workbook.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (!tables.items.some(table => table.name === 'Boardflare_Functions')) {
+            return [];
+        }
+
+        const table = tables.getItem('Boardflare_Functions');
         const nameColumn = table.columns.getItem('Name');
         const range = nameColumn.getDataBodyRange();
         range.load(['values', 'text']);
