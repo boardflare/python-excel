@@ -8,65 +8,53 @@ export async function updateFunctionsTable(parsedCode) {
                 sheet = context.workbook.worksheets.add("Boardflare_Functions");
                 await context.sync();
 
-                // Set column widths for both tables
+                // Set column widths
                 sheet.getRange("A:A").format.columnWidth = 100; // Name
                 sheet.getRange("B:B").format.columnWidth = 150; // Description
                 sheet.getRange("C:C").format.columnWidth = 300; // Code
-                sheet.getRange("D:D").format.columnWidth = 50;  // Empty separator
-                sheet.getRange("E:E").format.columnWidth = 150; // Usage
-                sheet.getRange("F:F").format.columnWidth = 150; // Example
                 await context.sync();
 
+                // Add title cell and merge
+                const titleRange = sheet.getRange("A1:C1");
+                titleRange.merge();
+                titleRange.values = [["Table info here", "", ""]];
+                titleRange.format.wrapText = true;
+
                 // Create Functions table
-                const functionsHeaderRange = sheet.getRange("A1:C1");
+                const functionsHeaderRange = sheet.getRange("A2:C2");
                 functionsHeaderRange.values = [["Name", "Description", "Code"]];
                 const functionsTable = sheet.tables.add(functionsHeaderRange, true);
-                functionsTable.name = "Functions";
+                functionsTable.name = "Boardflare_Functions";
 
-                // Create Examples table
-                const examplesHeaderRange = sheet.getRange("E1:F1");
-                examplesHeaderRange.values = [["Usage", "Example"]];
-                const examplesTable = sheet.tables.add(examplesHeaderRange, true);
-                examplesTable.name = "Examples";
-
-                // Add placeholder rows
-                const examplesPlaceholder = [[
-                    "Function signature",
-                    "e.g. =FOO(\"bar\")",
-                ]];
-
-                examplesTable.rows.add(null, examplesPlaceholder);
+                // Protect the worksheet immediately after creation
+                sheet.protection.protect();
 
                 await context.sync();
             }
 
-            sheet.activate();
-            const functionsTable = sheet.tables.getItem("Functions");
-            const examplesTable = sheet.tables.getItem("Examples");
+            // Unprotect sheet before making changes
+            sheet.protection.unprotect();
+            await context.sync();
 
-            // Add new rows to both tables
+            sheet.activate();
+            const functionsTable = sheet.tables.getItem("Boardflare_Functions");
+
+            // Add new row to functions table
             const functionsRow = [[
                 parsedCode.name,
                 parsedCode.description,
                 parsedCode.code
             ]];
 
-            const examplesRow = [[
-                parsedCode.signature,
-                parsedCode.named
-            ]];
-
             functionsTable.rows.add(null, functionsRow);
-            examplesTable.rows.add(null, examplesRow);
 
             // Set wrap text for all columns except code
             functionsTable.getRange().format.wrapText = true;
-            examplesTable.getRange().format.wrapText = true;
 
-            // Disable wrap text for code column
-            // const codeColumn = functionsTable.columns.getItem("Code");
-            // codeColumn.getRange().format.wrapText = false;
+            await context.sync();
 
+            // Reprotect sheet after changes
+            sheet.protection.protect();
             await context.sync();
 
         } catch (error) {
