@@ -47,6 +47,22 @@ export async function updateFunctionsTable(parsedCode) {
 
             const functionsTable = sheet.tables.getItem("Boardflare_Functions");
 
+            // Check for existing rows with the same function name
+            const tableRange = functionsTable.getDataBodyRange();
+            const nameColumn = tableRange.getColumn(0);
+            nameColumn.load("values");
+            await context.sync();
+
+            // Find and delete existing row with same name
+            const values = nameColumn.values;
+            for (let i = 0; i < values.length; i++) {
+                if (values[i][0] === parsedCode.name) {
+                    functionsTable.rows.getItemAt(i).delete();
+                    break;
+                }
+            }
+            await context.sync();
+
             // Add new row to functions table
             const functionsRow = [[
                 parsedCode.name,

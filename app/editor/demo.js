@@ -16,12 +16,12 @@ export async function addDemo(parsedCode) {
             sheet = context.workbook.worksheets.add(sheetName);
             await context.sync();
 
-            // Set uniform column widths for 6 columns now
-            sheet.getRangeByIndexes(0, 0, 1, 6).format.columnWidth = 100;
+            // Set uniform column widths for 2 columns now
+            sheet.getRangeByIndexes(0, 0, 1, 2).format.columnWidth = 100;
 
-            // Set headers with new column
-            const headerRange = sheet.getRangeByIndexes(0, 0, 1, 6);
-            headerRange.values = [["Case", "Arg1", "Arg2", "Arg3", "Expected Result", "Actual Result"]];
+            // Set headers with new columns
+            const headerRange = sheet.getRangeByIndexes(0, 0, 1, 2);
+            headerRange.values = [["Case", "Result"]];
 
             // Format headers like a table
             headerRange.format.fill.color = "#D9D9D9";
@@ -39,21 +39,18 @@ export async function addDemo(parsedCode) {
 
             // Add test cases
             if (testCases.length > 0) {
-                const dataRange = sheet.getRangeByIndexes(1, 0, testCases.length, 6);
+                const dataRange = sheet.getRangeByIndexes(1, 0, testCases.length, 2);
                 const values = testCases.map((testCase, index) => {
                     // Generate dynamic formula based on actual args present
                     const rowIndex = index + 2; // +2 because 1-based and header row
-                    let formula = parsedCode.named.replace('[@Arg1]', `B${rowIndex}`);
-                    if (testCase.arg2) formula = formula.replace(`B${rowIndex}`, `B${rowIndex},C${rowIndex}`);
-                    if (testCase.arg3) formula = formula.replace(`B${rowIndex}`, `B${rowIndex},C${rowIndex},D${rowIndex}`);
+                    let formula = parsedCode.named;
+                    formula = formula.replace('arg1', typeof testCase.arg1 === 'string' ? `"${testCase.arg1}"` : testCase.arg1 || '');
+                    if (testCase.arg2) formula = formula.replace('arg2', typeof testCase.arg2 === 'string' ? `"${testCase.arg2}"` : testCase.arg2);
+                    if (testCase.arg3) formula = formula.replace('arg3', typeof testCase.arg3 === 'string' ? `"${testCase.arg3}"` : testCase.arg3);
 
                     return [
                         index + 1,                // Case number (1-based)
-                        testCase.arg1 || '',      // Arg1
-                        testCase.arg2 || '',      // Arg2
-                        testCase.arg3 || '',      // Arg3
-                        testCase.result || '',    // Expected result
-                        formula                   // Actual result formula
+                        formula                   // Result formula
                     ];
                 });
 

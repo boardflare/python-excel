@@ -63,7 +63,6 @@ export async function createNewFunction() {
                     console.error('Dialog message handling error:', error);
                     progress.textContent = "Error handling dialog message";
                     progress.style.color = "red";
-                    clearProgress();
                 }
             });
         }
@@ -79,24 +78,21 @@ async function addFunction(message) {
         if (parsedCode.error) {
             progress.textContent = parsedCode.error;
             progress.style.color = "orange";
-            clearProgress();
             return;
         }
 
         await Promise.all([
             updateFunctionsTable(parsedCode),
-            updateNameManager(parsedCode),
-            addDemo(parsedCode)
+            //updateNameManager(parsedCode),
+            //addDemo(parsedCode)
         ]);
 
-        progress.textContent = "Function saved successfully!";
+        progress.textContent = `${parsedCode.signature} has been saved!  You can now use it by typing =${parsedCode.name} in a cell.  Disregard the error messages below, they are due to a bug in Excel and only appear when creating or updated the code.\n\n\n`;
         progress.style.color = "green";
-        clearProgress();
     } catch (error) {
         progress.textContent = error.message;
         progress.style.color = "red";
         console.error('Error saving function:', error);
-        clearProgress();
     }
 }
 
@@ -158,14 +154,4 @@ async function getFunctionCode(functionName) {
         code: codes[index],
         testCases: testCases[index]
     }) : '';
-}
-
-function clearProgress() {
-    setTimeout(() => {
-        progress.textContent = '';
-    }, 3000);
-
-    setTimeout(() => {
-        progress.textContent = '';
-    }, 6000);
 }
