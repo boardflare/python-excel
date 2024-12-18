@@ -21,24 +21,22 @@ export async function createNewFunction() {
             const dialog = result.value;
             dialog.addEventHandler(Office.EventType.DialogMessageReceived, async (arg) => {
                 try {
-                    // Handle empty or invalid messages
                     if (!arg.message) return;
 
-                    // Handle string messages (save function case)
-                    if (typeof arg.message === 'string' && !arg.message.startsWith('{')) {
-                        if (arg.message) {
-                            await addFunction(arg.message);
-                        }
+                    // Parse the message first
+                    const message = JSON.parse(arg.message);
+
+                    // If message contains code and testCases, it's a save operation
+                    if (message.code) {
+                        await addFunction(message);
                         dialog.close();
                         return;
                     }
 
-                    // Handle JSON messages
-                    const message = JSON.parse(arg.message);
+                    // Handle other actions
                     switch (message.action) {
                         case 'getFunctionsList':
                             const functions = await getFunctionsList();
-                            console.log('Sending functions list:', functions);
                             try {
                                 dialog.messageChild(JSON.stringify({
                                     type: 'functionsList',
@@ -54,7 +52,7 @@ export async function createNewFunction() {
                             try {
                                 dialog.messageChild(JSON.stringify({
                                     type: 'functionCode',
-                                    code: code
+                                    ...JSON.parse(code)
                                 }));
                             } catch (e) {
                                 console.error('Error sending message to dialog:', e);
@@ -72,10 +70,11 @@ export async function createNewFunction() {
     );
 }
 
-async function addFunction(code) {
+async function addFunction(message) {
     try {
-        const parsedCode = parsePython(code);
+        const parsedCode = parsePython(message.code);
         console.log('parsedCode:', parsedCode);
+        parsedCode.testCases = message.testCases;
 
         if (parsedCode.error) {
             progress.textContent = parsedCode.error;
@@ -84,10 +83,8 @@ async function addFunction(code) {
             return;
         }
 
-        // Update functions worksheet and demo worksheet
         await Promise.all([
             updateFunctionsTable(parsedCode),
-            //updateDemoTable(parsedCode),
             updateNameManager(parsedCode)
         ]);
 
@@ -139,18 +136,27 @@ async function getFunctionsList() {
 }
 
 async function getFunctionCode(functionName) {
-    // Retrieve the code of the specified function
     const context = new Excel.RequestContext();
     const table = context.workbook.tables.getItem('Boardflare_Functions');
     const nameColumn = table.columns.getItem('Name');
     const codeColumn = table.columns.getItem('Code');
+    const testCasesColumn = table.columns.getItem('TestCases');
+
     const nameRange = nameColumn.getDataBodyRange().load('values');
     const codeRange = codeColumn.getDataBodyRange().load('values');
+    const testCasesRange = testCasesColumn.getDataBodyRange().load('values');
+
     await context.sync();
+
     const names = nameRange.values.map(row => row[0]);
     const codes = codeRange.values.map(row => row[0]);
+    const testCases = testCasesRange.values.map(row => row[0]);
+
     const index = names.indexOf(functionName);
-    return index !== -1 ? codes[index] : '';
+    return index !== -1 ? JSON.stringify({
+        code: codes[index],
+        testCases: testCases[index]
+    }) : '';
 }
 
 function clearProgress() {

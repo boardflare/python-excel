@@ -10,26 +10,28 @@ export async function updateFunctionsTable(parsedCode) {
 
                 // Set column widths
                 sheet.getRange("A:A").format.columnWidth = 100; // Name
-                sheet.getRange("B:B").format.columnWidth = 150; // Description
-                sheet.getRange("C:C").format.columnWidth = 300; // Code
-                sheet.getRange("D:D").format.columnWidth = 150; // Usage
+                sheet.getRange("B:B").format.columnWidth = 100; // Signature
+                sheet.getRange("C:C").format.columnWidth = 150; // Description
+                sheet.getRange("D:D").format.columnWidth = 300; // Code
+                sheet.getRange("E:E").format.columnWidth = 100; // Requirements
+                sheet.getRange("F:F").format.columnWidth = 200; // TestCases
                 await context.sync();
 
                 // Add title cell and merge
-                const titleRange = sheet.getRange("A1:D1");
-                titleRange.values = [["⚠️ WARNING ⚠️:  The table below is used to store your functions. DO NOT EDIT IT DIRECTLY.  It is protected to help prevent you from doing this by accident.  If you decide to ignore this and corrupt it by mistake, you will need to restore it yourself from the OneDrive version history or some other backup.  The add-in has no ability to fix it.", "", "", ""]];
+                const titleRange = sheet.getRange("A1:F1");
+                titleRange.values = [["⚠️ WARNING ⚠️:  The table below is used to store your functions. DO NOT EDIT IT DIRECTLY.  It is protected to help prevent you from doing this by accident.  The add-in has no ability to fix it, and you may lose all of your functions.", "", "", "", "", ""]];
                 titleRange.format.horizontalAlignment = "left";
                 titleRange.format.verticalAlignment = "top";
                 titleRange.merge();
                 titleRange.format.wrapText = true;
                 titleRange.format.font.size = 13;
                 titleRange.format.fill.color = "yellow";
-                titleRange.format.rowHeight = 60;
+                titleRange.format.rowHeight = 40;
                 await context.sync();
 
                 // Create Functions table
-                const functionsHeaderRange = sheet.getRange("A2:D2");
-                functionsHeaderRange.values = [["Name", "Description", "Code", "Usage"]];
+                const functionsHeaderRange = sheet.getRange("A2:F2");
+                functionsHeaderRange.values = [["Name", "Signature", "Description", "Code", "Requirements", "TestCases"]];
                 const functionsTable = sheet.tables.add(functionsHeaderRange, true);
                 functionsTable.name = "Boardflare_Functions";
 
@@ -43,15 +45,16 @@ export async function updateFunctionsTable(parsedCode) {
             sheet.protection.unprotect();
             await context.sync();
 
-            sheet.activate();
             const functionsTable = sheet.tables.getItem("Boardflare_Functions");
 
             // Add new row to functions table
             const functionsRow = [[
                 parsedCode.name,
+                parsedCode.signature,
                 parsedCode.description,
                 parsedCode.code,
-                parsedCode.signature
+                null,  // Requirements
+                parsedCode.testCases  // TestCases
             ]];
 
             functionsTable.rows.add(null, functionsRow);

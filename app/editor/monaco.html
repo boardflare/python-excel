@@ -6,14 +6,36 @@
     <title>Create Python Function</title>
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs/loader.min.js"></script>
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
         body {
             margin: 10px;
         }
 
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 80px);
+            gap: 10px;
+        }
+
         #editor {
             border: 1px solid #ccc;
-            height: calc(100vh - 80px);
+            height: 55%;
+            width: 100%;
+        }
+
+        .block {
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        #testEditor {
+            border: 1px solid #ccc;
+            height: 25%;
             width: 100%;
         }
 
@@ -29,7 +51,14 @@
     <select id="functionDropdown">
         <!-- Options will be populated dynamically -->
     </select>
-    <div id="editor"></div>
+    <div class="editor-container">
+        <div id="editor"></div>
+        <div class="block">
+            Write your Python function above. The function should take inputs and return a value.
+            Test cases below should be a JSON array of objects containing input arguments and expected results.
+        </div>
+        <div id="testEditor"></div>
+    </div>
     <div class="button-row">
         <button id="cancelBtn">Cancel</button>
         <button id="saveBtn">Create Function</button>
@@ -47,9 +76,30 @@
                     '    return text.capitalize()',
                 ].join('\n');
 
+                const defaultTestCases = [
+                    '[',
+                    '    {',
+                    '        "arg1": "hello world",',
+                    '        "result": "Hello world"',
+                    '    },',
+                    '    {',
+                    '        "arg1": "testing",',
+                    '        "result": "Testing"',
+                    '    }',
+                    ']'
+                ].join('\n');
+
                 const editor = monaco.editor.create(document.getElementById('editor'), {
                     value: defaultCode,
                     language: 'python',
+                    theme: 'vs-dark',
+                    fontSize: 16,
+                    minimap: { enabled: false }
+                });
+
+                const testEditor = monaco.editor.create(document.getElementById('testEditor'), {
+                    value: defaultTestCases,
+                    language: 'json',
                     theme: 'vs-dark',
                     fontSize: 16,
                     minimap: { enabled: false }
@@ -84,6 +134,7 @@
                             } else if (message.type === 'functionCode') {
                                 console.log('Setting editor code to:', message.code);
                                 editor.setValue(message.code || defaultCode);
+                                testEditor.setValue(message.testCases || defaultTestCases);
                             }
                         } catch (error) {
                             console.error('Error in dialog message handler:', error);
@@ -100,7 +151,11 @@
                 };
 
                 document.getElementById('saveBtn').onclick = function () {
-                    Office.context.ui.messageParent(editor.getValue());
+                    const messageData = {
+                        code: editor.getValue(),
+                        testCases: testEditor.getValue()
+                    };
+                    Office.context.ui.messageParent(JSON.stringify(messageData));
                 };
 
                 document.getElementById('cancelBtn').onclick = function () {
