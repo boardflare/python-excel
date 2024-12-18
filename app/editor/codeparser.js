@@ -32,7 +32,7 @@ export function parsePython(rawCode) {
 
     // Create lambda formula with dynamic runpy environment and sheet references
     const signature = `${name}(${params})`;
-    const codeRef = `LET(range,'Boardflare_Functions'!$A$3:$Z$50,XLOOKUP("${name}",INDEX(range,,1),INDEX(range,,4),"Not found"))`;
+    const codeRef = `LET(range,'Boardflare_Functions'!$A$2:$D$200,XLOOKUP("${name}",INDEX(range,,1),INDEX(range,,4),""))`;
     const formula = `=LAMBDA(${params}, ${runpyEnv}(${codeRef}, ${params}))`;
 
     return {

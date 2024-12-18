@@ -84,7 +84,7 @@ async function addFunction(message) {
         await Promise.all([
             updateFunctionsTable(parsedCode),
             updateNameManager(parsedCode),
-            //addDemo(parsedCode)
+            addDemo(parsedCode)
         ]);
 
         progress.textContent = `${parsedCode.signature} has been saved!  You can now use it by typing =${parsedCode.name} in a cell.  Disregard the error messages below, they are due to a bug in Excel and only appear when creating or updated the code.\n\n\n`;
