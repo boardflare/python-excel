@@ -1,3 +1,5 @@
+https://learn.microsoft.com/en-us/office/dev/add-ins/develop/persisting-add-in-state-and-settings#custom-properties-in-excel-and-word
+
 ```javascript
 
 export async function codePy(prompt, arg1) {

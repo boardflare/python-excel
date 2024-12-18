@@ -1,7 +1,7 @@
 import { parsePython } from './codeparser.js';
 import { updateNameManager } from './nameManager.js';
 import { updateFunctionsTable } from './functionsTable.js';
-import { updateDemoTable } from './demoTable.js';
+import { addDemo } from './demo.js';
 
 const progress = document.getElementById('progress');
 
@@ -85,7 +85,8 @@ async function addFunction(message) {
 
         await Promise.all([
             updateFunctionsTable(parsedCode),
-            updateNameManager(parsedCode)
+            updateNameManager(parsedCode),
+            addDemo(parsedCode)
         ]);
 
         progress.textContent = "Function saved successfully!";
