@@ -43,6 +43,11 @@
             margin: 10px 0;
             text-align: right;
         }
+
+        .button-row button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -156,6 +161,9 @@
                         testCases: testEditor.getValue()
                     };
                     Office.context.ui.messageParent(JSON.stringify(messageData));
+                    // Disable the button both in JS and HTML
+                    this.disabled = true;
+                    this.setAttribute('disabled', 'disabled');
                 };
 
                 document.getElementById('cancelBtn').onclick = function () {

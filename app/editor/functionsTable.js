@@ -19,7 +19,7 @@ export async function updateFunctionsTable(parsedCode) {
 
                 // Add title cell and merge
                 const titleRange = sheet.getRange("A1:F1");
-                titleRange.values = [["⚠️ WARNING ⚠️:  The table below is used to store your functions. DO NOT EDIT IT DIRECTLY.  It is protected to help prevent you from doing this by accident.  The add-in has no ability to fix it, and you may lose all of your functions.", "", "", "", "", ""]];
+                titleRange.values = [["⚠️ WARNING ⚠️:  The table below is used to store the functions you create with Boardflare Python for Excel. DO NOT EDIT IT DIRECTLY.  It is protected to help prevent you from doing this by accident.  If you delete it your functions will stop working.  However, feel free to hide it.", "", "", "", "", ""]];
                 titleRange.format.horizontalAlignment = "left";
                 titleRange.format.verticalAlignment = "top";
                 titleRange.merge();
