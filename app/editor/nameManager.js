@@ -14,30 +14,30 @@ export async function updateNameManager(parsedCode) {
 
     // Create link to workbook
     const url = Office.context.document.url;
-    console.log("Workbook URL:", url);
+    console.log("Name manager props:", parsedCode.name, parsedCode.formula);
 
     return Excel.run(async (context) => {
-        let namedItem;
+        // Get named item or null object
+        const namedItem = context.workbook.names.getItemOrNullObject(parsedCode.name);
+        namedItem.load(['formula', 'comment', 'isNullObject']);
+        await context.sync();
 
-        // Try to get existing name
-        try {
-            namedItem = context.workbook.names.getItem(parsedCode.name);
-            await context.sync();
-
-            // Update existing name
-            namedItem.formula = parsedCode.formula;
-        } catch (error) {
+        if (namedItem.isNullObject) {
             // Create new name if it doesn't exist
-            if (error.code === 'ItemNotFound') {
-                namedItem = context.workbook.names.add(parsedCode.name, parsedCode.formula);
-            } else {
-                throw error;
+            const newNamedItem = context.workbook.names.add(parsedCode.name, parsedCode.formula);
+            newNamedItem.visible = true;
+            if (parsedCode.description) {
+                newNamedItem.comment = parsedCode.description;
             }
-        }
-
-        namedItem.visible = true;
-        if (parsedCode.description) {
-            namedItem.comment = parsedCode.description;
+        } else {
+            // Update existing name if formula is different
+            if (namedItem.formula !== parsedCode.formula) {
+                namedItem.formula = parsedCode.formula;
+            }
+            namedItem.visible = true;
+            if (parsedCode.description && parsedCode.description !== namedItem.comment) {
+                namedItem.comment = parsedCode.description;
+            }
         }
 
         await context.sync();

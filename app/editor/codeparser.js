@@ -18,11 +18,6 @@ export function parsePython(rawCode) {
         ? (docstringMatch[1] || docstringMatch[2]).trim().slice(0, 255)
         : 'No description available';
 
-    // Extract example
-    const exampleMatch = rawCode.match(/^#?\s*example\s*=\s*["'](.+?)["']/m);
-    // const example = exampleMatch ? exampleMatch[1] : 'No example set in code';
-    const arg1 = "this";
-
     // Generate result string
     const argList = args.map((_, index) => `arg${index + 1}`).join(', ');
     const code = `${rawCode.trim()}\n\nresult = ${name.toLowerCase()}(${argList})`;
@@ -35,24 +30,16 @@ export function parsePython(rawCode) {
         runpyEnv = 'PREVIEW.RUNPY';
     }
 
-    // Create lambda formula with dynamic runpy environment and table references
-    const escapedCode = code.replace(/"/g, '""');
+    // Create lambda formula with dynamic runpy environment and sheet references
     const signature = `${name}(${params})`;
-    const codeRef = `LET(range,'Boardflare_Functions'!$A$2:$Z$50,XLOOKUP("${name}",INDEX(range,,1),INDEX(range,,3),"Not found"))`;
+    const codeRef = `LET(range,'Boardflare_Functions'!$A$3:$Z$50,XLOOKUP("${name}",INDEX(range,,1),INDEX(range,,4),"Not found"))`;
     const formula = `=LAMBDA(${params}, ${runpyEnv}(${codeRef}, ${params}))`;
-    const runpy = `=${runpyEnv}(${codeRef}, [@Arg1])`;
-    const lambda = `${formula}([@Arg1])`;
-    const named = `=${name}([@Arg1])`;
 
     return {
         name,
         signature,
         description,
         code,
-        arg1,
-        runpy,
-        lambda,
-        named,
         formula
     };
 }
