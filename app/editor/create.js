@@ -83,7 +83,7 @@ async function addFunction(message) {
 
         await Promise.all([
             updateFunctionsTable(parsedCode),
-            //updateNameManager(parsedCode),
+            updateNameManager(parsedCode),
             //addDemo(parsedCode)
         ]);
 
