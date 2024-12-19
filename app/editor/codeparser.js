@@ -40,6 +40,7 @@ export function parsePython(rawCode) {
         signature,
         description,
         code,
-        formula
+        formula,
+        named: `${name}(${args.map((_, index) => `arg${index + 1}`).join(', ')})`
     };
 }

@@ -16,8 +16,9 @@ export async function addDemo(parsedCode) {
             sheet = context.workbook.worksheets.add(sheetName);
             await context.sync();
 
-            // Set uniform column widths for 2 columns now
-            sheet.getRangeByIndexes(0, 0, 1, 2).format.columnWidth = 100;
+            // Set different column widths for Case and Result columns
+            sheet.getRangeByIndexes(0, 0, 1, 1).format.columnWidth = 50;  // Case column
+            sheet.getRangeByIndexes(0, 1, 1, 1).format.columnWidth = 300; // Result column
 
             // Set headers with new columns
             const headerRange = sheet.getRangeByIndexes(0, 0, 1, 2);
@@ -43,10 +44,15 @@ export async function addDemo(parsedCode) {
                 const values = testCases.map((testCase, index) => {
                     // Generate dynamic formula based on actual args present
                     const rowIndex = index + 2; // +2 because 1-based and header row
-                    let formula = parsedCode.named;
-                    formula = formula.replace('arg1', typeof testCase.arg1 === 'string' ? `"${testCase.arg1}"` : testCase.arg1 || '');
-                    if (testCase.arg2) formula = formula.replace('arg2', typeof testCase.arg2 === 'string' ? `"${testCase.arg2}"` : testCase.arg2);
-                    if (testCase.arg3) formula = formula.replace('arg3', typeof testCase.arg3 === 'string' ? `"${testCase.arg3}"` : testCase.arg3);
+                    let formula = `=${parsedCode.name}(`;
+
+                    // Build argument list
+                    const args = [];
+                    if ('arg1' in testCase) args.push(typeof testCase.arg1 === 'string' ? `"${testCase.arg1}"` : testCase.arg1);
+                    if ('arg2' in testCase) args.push(typeof testCase.arg2 === 'string' ? `"${testCase.arg2}"` : testCase.arg2);
+                    if ('arg3' in testCase) args.push(typeof testCase.arg3 === 'string' ? `"${testCase.arg3}"` : testCase.arg3);
+
+                    formula += args.join(', ') + ')';
 
                     return [
                         index + 1,                // Case number (1-based)
