@@ -20,18 +20,20 @@ export default {
 
 			const url = new URL(request.url);
 			console.log('URL:', url);
-			const decodedPath = decodeURIComponent(url.pathname.slice(1));
-			const [uid, func, timestamp] = decodedPath.split('|');
 
-			if (!uid || !func || !timestamp) {
-				throw new Error('Invalid key format. Use: /uid|function|timestamp');
+			const uid = url.searchParams.get('uid');
+			const func = url.searchParams.get('func');
+			const timestamp = url.searchParams.get('timestamp');
+
+			if (!uid || !timestamp) {
+				throw new Error('Missing required query parameters. Use: ?uid=xxx&timestamp=xxx');
 			}
 			console.log('UID:', uid, 'Function:', func, 'Timestamp:', timestamp);
 
 			let entity;
 			if (uid.startsWith('ANON:')) {
-				// For anonymous: PK=timestamp, RK=uid|function
-				entity = await getAnonCode(env, timestamp, `${uid}|${func}`);
+				// For anonymous: PK=timestamp, RK=uid
+				entity = await getAnonCode(env, timestamp, uid);
 			} else {
 				// For users: PK=uid, RK=function|timestamp
 				entity = await getUserCode(env, uid, `${func}|${timestamp}`);

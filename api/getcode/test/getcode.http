@@ -1,0 +1,6 @@
+### ANON local code retrieval
+GET http://localhost:8787/?uid=ANON:mycid&timestamp=mytimestamp HTTP/1.1
+
+### ANON remote code retrieval
+GET https://getcode.boardflare.workers.dev/?uid=ANON:mycid&timestamp=mytimestamp HTTP/1.1
+
