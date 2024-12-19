@@ -6,6 +6,7 @@
     <title>Create Python Function</title>
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs/loader.min.js"></script>
+    <script src="editor.js" defer></script>
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
         body {
@@ -48,6 +49,28 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
+
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .confirm-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
@@ -67,106 +90,19 @@
     </div>
     <div class="button-row">
         <button id="cancelBtn">Cancel</button>
-        <button id="saveBtn">Create Function</button>
+        <button class="action" id="saveBtn">Save</button>
     </div>
 
-    <script>
-        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.0/min/vs' } });
-
-        Office.onReady().then(() => {
-            require(['vs/editor/editor.main'], function () {
-                const defaultCode = [
-                    'def foo(text):',
-                    '    """ This is a sample function. """',
-                    '    print(text)',
-                    '    return text.capitalize()',
-                ].join('\n');
-
-                const defaultTestCases = [
-                    '[',
-                    '    ["hello world"],',
-                    '    ["testing"]',
-                    ']'
-                ].join('\n');
-
-                const editor = monaco.editor.create(document.getElementById('editor'), {
-                    value: defaultCode,
-                    language: 'python',
-                    theme: 'vs-dark',
-                    fontSize: 16,
-                    minimap: { enabled: false }
-                });
-
-                const testEditor = monaco.editor.create(document.getElementById('testEditor'), {
-                    value: defaultTestCases,
-                    language: 'json',
-                    theme: 'vs-dark',
-                    fontSize: 16,
-                    minimap: { enabled: false }
-                });
-
-                // Request the list of functions from the parent page
-                Office.context.ui.messageParent(JSON.stringify({ action: 'getFunctionsList' }));
-
-                // Remove window event listener and use Office dialog messaging
-                Office.context.ui.addHandlerAsync(
-                    Microsoft.Office.WebExtension.EventType.DialogParentMessageReceived,
-                    function (arg) {
-                        console.log('Dialog received message:', arg);
-                        try {
-                            if (!arg.message) return;
-                            const message = JSON.parse(arg.message);
-                            console.log('Parsed message in dialog:', message);
-
-                            if (message.type === 'functionsList') {
-                                console.log('Populating dropdown with:', message.functions);
-                                const dropdown = document.getElementById('functionDropdown');
-                                dropdown.innerHTML = '<option value="">Select a function...</option>';
-
-                                message.functions.forEach(func => {
-                                    if (func && func.name) {
-                                        const option = document.createElement('option');
-                                        option.value = func.name;
-                                        option.textContent = func.name;
-                                        dropdown.appendChild(option);
-                                    }
-                                });
-                            } else if (message.type === 'functionCode') {
-                                console.log('Setting editor code to:', message.code);
-                                editor.setValue(message.code || defaultCode);
-                                testEditor.setValue(message.testCases || defaultTestCases);
-                            }
-                        } catch (error) {
-                            console.error('Error in dialog message handler:', error);
-                        }
-                    }
-                );
-
-                document.getElementById('functionDropdown').onchange = function () {
-                    const selectedFunction = this.value;
-                    Office.context.ui.messageParent(JSON.stringify({
-                        action: 'getFunctionCode',
-                        name: selectedFunction
-                    }));
-                };
-
-                document.getElementById('saveBtn').onclick = function () {
-                    const messageData = {
-                        code: editor.getValue(),
-                        testCases: testEditor.getValue()
-                    };
-                    Office.context.ui.messageParent(JSON.stringify(messageData));
-                    // Disable the button both in JS and HTML
-                    this.disabled = true;
-                    this.setAttribute('disabled', 'disabled');
-                };
-
-                document.getElementById('cancelBtn').onclick = function () {
-                    Office.context.ui.messageParent(JSON.stringify({ action: 'cancel' }));
-                };
-            });
-        });
-    </script>
+    <!-- Add confirmation dialog -->
+    <div id="confirmOverlay" class="confirm-overlay">
+        <div class="confirm-dialog">
+            <p id="confirmMessage">Are you sure you want to overwrite this function with your changes?</p>
+            <div class="button-row">
+                <button id="confirmNo">Cancel</button>
+                <button class="action" id="confirmYes">OK</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
