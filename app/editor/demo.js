@@ -41,22 +41,21 @@ export async function addDemo(parsedCode) {
             // Add test cases
             if (testCases.length > 0) {
                 const dataRange = sheet.getRangeByIndexes(1, 0, testCases.length, 2);
-                const values = testCases.map((testCase, index) => {
-                    // Generate dynamic formula based on actual args present
+                const values = testCases.map((args, index) => {
+                    // Generate dynamic formula based on number of arguments
                     const rowIndex = index + 2; // +2 because 1-based and header row
                     let formula = `=${parsedCode.name}(`;
 
-                    // Build argument list
-                    const args = [];
-                    if ('arg1' in testCase) args.push(typeof testCase.arg1 === 'string' ? `"${testCase.arg1}"` : testCase.arg1);
-                    if ('arg2' in testCase) args.push(typeof testCase.arg2 === 'string' ? `"${testCase.arg2}"` : testCase.arg2);
-                    if ('arg3' in testCase) args.push(typeof testCase.arg3 === 'string' ? `"${testCase.arg3}"` : testCase.arg3);
+                    // Convert each argument to proper string format
+                    const formattedArgs = args.map(arg =>
+                        typeof arg === 'string' ? `"${arg}"` : arg
+                    );
 
-                    formula += args.join(', ') + ')';
+                    formula += formattedArgs.join(', ') + ')';
 
                     return [
-                        index + 1,                // Case number (1-based)
-                        formula                   // Result formula
+                        index + 1,    // Case number (1-based)
+                        formula       // Result formula
                     ];
                 });
 

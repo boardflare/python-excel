@@ -20,7 +20,9 @@ export function parsePython(rawCode) {
 
     // Generate result string
     const argList = args.map((_, index) => `arg${index + 1}`).join(', ');
-    const code = `${rawCode.trim()}\n\nresult = ${name.toLowerCase()}(${argList})`;
+    const resultLine = `\n\nresult = ${name.toLowerCase()}(${argList})`;
+    // Only append result line if it doesn't already exist
+    const code = rawCode.trim() + (rawCode.includes(resultLine) ? '' : resultLine);
 
     // Determine which runpy environment to use
     let runpyEnv = 'BOARDFLARE.RUNPY';

@@ -26,6 +26,12 @@ export async function createNewFunction() {
                     // Parse the message first
                     const message = JSON.parse(arg.message);
 
+                    // Handle cancel action
+                    if (message.action === 'cancel') {
+                        dialog.close();
+                        return;
+                    }
+
                     // If message contains code and testCases, it's a save operation
                     if (message.code) {
                         await addFunction(message);
@@ -87,7 +93,7 @@ async function addFunction(message) {
             addDemo(parsedCode)
         ]);
 
-        progress.textContent = `${parsedCode.signature} has been saved!  You can now use it by typing =${parsedCode.name} in a cell.  Disregard the error messages below, they are due to a bug in Excel and only appear when creating or updated the code.\n\n\n`;
+        progress.textContent = `${parsedCode.signature} has been saved!  You can now use it by typing =${parsedCode.name} in a cell.\n\n`;
         progress.style.color = "green";
     } catch (error) {
         progress.textContent = error.message;

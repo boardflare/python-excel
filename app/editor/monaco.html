@@ -83,14 +83,8 @@
 
                 const defaultTestCases = [
                     '[',
-                    '    {',
-                    '        "arg1": "hello world",',
-                    '        "result": "Hello world"',
-                    '    },',
-                    '    {',
-                    '        "arg1": "testing",',
-                    '        "result": "Testing"',
-                    '    }',
+                    '    ["hello world"],',
+                    '    ["testing"]',
                     ']'
                 ].join('\n');
 
@@ -167,7 +161,7 @@
                 };
 
                 document.getElementById('cancelBtn').onclick = function () {
-                    Office.context.ui.messageParent('');
+                    Office.context.ui.messageParent(JSON.stringify({ action: 'cancel' }));
                 };
             });
         });
