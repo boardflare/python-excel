@@ -22,13 +22,13 @@ export default {
 			console.log('URL:', url);
 
 			const uid = url.searchParams.get('uid');
-			const func = url.searchParams.get('func');
+			const name = url.searchParams.get('name');
 			const timestamp = url.searchParams.get('timestamp');
 
 			if (!uid || !timestamp) {
 				throw new Error('Missing required query parameters. Use: ?uid=xxx&timestamp=xxx');
 			}
-			console.log('UID:', uid, 'Function:', func, 'Timestamp:', timestamp);
+			console.log('UID:', uid, 'Function:', name, 'Timestamp:', timestamp);
 
 			let entity;
 			if (uid.startsWith('ANON:')) {
@@ -36,11 +36,21 @@ export default {
 				entity = await getAnonCode(env, timestamp, uid);
 			} else {
 				// For users: PK=uid, RK=function|timestamp
-				entity = await getUserCode(env, uid, `${func}|${timestamp}`);
+				entity = await getUserCode(env, uid, `${name}|${timestamp}`);
 			}
 
 			if (!entity) {
 				throw new Error('Entity not found');
+			}
+
+			const returnParam = url.searchParams.get('return');
+			if (returnParam === 'code') {
+				return new Response(entity.code, {
+					headers: {
+						...cacheHeaders,
+						'Content-Type': 'text/plain'
+					}
+				});
 			}
 
 			return Response.json(entity, { headers: cacheHeaders });

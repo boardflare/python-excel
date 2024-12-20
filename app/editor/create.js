@@ -1,7 +1,7 @@
 import { parsePython } from './codeparser.js';
 import { updateNameManager } from './nameManager.js';
-import { updateFunctionsTable } from './functionsTable.js';
 import { addDemo } from './demo.js';
+import { saveFunction, getFunctionNames, getFunctionCode } from './functions.js';
 
 const progress = document.getElementById('progress');
 
@@ -42,7 +42,7 @@ export async function createNewFunction() {
                     // Handle other actions
                     switch (message.action) {
                         case 'getFunctionsList':
-                            const functions = await getFunctionsList();
+                            const functions = await getFunctionNames();
                             try {
                                 dialog.messageChild(JSON.stringify({
                                     type: 'functionsList',
@@ -88,9 +88,9 @@ async function addFunction(message) {
         }
 
         await Promise.all([
-            updateFunctionsTable(parsedCode),
+            saveFunction(parsedCode),
             updateNameManager(parsedCode),
-            addDemo(parsedCode)
+            addDemo(parsedCode),
         ]);
 
         progress.textContent = `${parsedCode.signature} has been saved!  You can now use it by typing =${parsedCode.name} in a cell.\n\n`;
@@ -100,64 +100,4 @@ async function addFunction(message) {
         progress.style.color = "red";
         console.error('Error saving function:', error);
     }
-}
-
-async function getFunctionsList() {
-    try {
-        const context = new Excel.RequestContext();
-
-        // Check if table exists first
-        const tables = context.workbook.tables;
-        tables.load("items");
-        await context.sync();
-
-        if (!tables.items.some(table => table.name === 'Boardflare_Functions')) {
-            return [];
-        }
-
-        const table = tables.getItem('Boardflare_Functions');
-        const nameColumn = table.columns.getItem('Name');
-        const range = nameColumn.getDataBodyRange();
-        range.load(['values', 'text']);
-
-        await context.sync();
-
-        // Ensure we have values before mapping
-        if (!range.values || range.values.length === 0) {
-            return [];
-        }
-
-        // Map the values to the expected format
-        return range.values.map(row => ({
-            name: row[0] || ''
-        })).filter(item => item.name); // Filter out empty names
-
-    } catch (error) {
-        console.error('Error getting functions list:', error);
-        return [];
-    }
-}
-
-async function getFunctionCode(functionName) {
-    const context = new Excel.RequestContext();
-    const table = context.workbook.tables.getItem('Boardflare_Functions');
-    const nameColumn = table.columns.getItem('Name');
-    const codeColumn = table.columns.getItem('Code');
-    const testCasesColumn = table.columns.getItem('TestCases');
-
-    const nameRange = nameColumn.getDataBodyRange().load('values');
-    const codeRange = codeColumn.getDataBodyRange().load('values');
-    const testCasesRange = testCasesColumn.getDataBodyRange().load('values');
-
-    await context.sync();
-
-    const names = nameRange.values.map(row => row[0]);
-    const codes = codeRange.values.map(row => row[0]);
-    const testCases = testCasesRange.values.map(row => row[0]);
-
-    const index = names.indexOf(functionName);
-    return index !== -1 ? JSON.stringify({
-        code: codes[index],
-        testCases: testCases[index]
-    }) : '';
 }

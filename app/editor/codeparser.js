@@ -4,6 +4,10 @@ export function parsePython(rawCode) {
     }
     console.log('Parsing code:', rawCode);
 
+    // Generate unique identifiers
+    const timestamp = new Date().toISOString();
+    const uid = "ANON:" + crypto.randomUUID();
+
     // Improved function pattern to better handle whitespace
     const functionMatch = rawCode.match(/def\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([\s\S]*?)\)\s*:/);
     if (!functionMatch) throw new Error("No function definition found");
@@ -34,7 +38,7 @@ export function parsePython(rawCode) {
 
     // Create lambda formula with dynamic runpy environment and sheet references
     const signature = `${name}(${params})`;
-    const codeRef = `LET(range,'Boardflare_Functions'!$A$2:$D$200,XLOOKUP("${name}",INDEX(range,,1),INDEX(range,,4),""))`;
+    const codeRef = `https://py.boardflare.com/?uid=${uid}&timestamp=${timestamp}&name=${name}&return=code`;
     const formula = `=LAMBDA(${params}, ${runpyEnv}(${codeRef}, ${params}))`;
 
     return {
@@ -43,6 +47,7 @@ export function parsePython(rawCode) {
         description,
         code,
         formula,
-        named: `${name}(${args.map((_, index) => `arg${index + 1}`).join(', ')})`
+        timestamp,  // Add timestamp
+        uid,        // Add uid
     };
 }

@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Stlite App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.73.0/build/stlite.css" />
+    <link rel="stylesheet" data-name="vs/editor/editor.main"
+        href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+        }
+
+        #editor-container {
+            flex: 0 0 auto;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1000;
+            background: white;
+        }
+
+        #editor {
+            height: 300px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        #update-btn {
+            padding: 8px 16px;
+            cursor: pointer;
+            position: relative;
+            z-index: 1000;
+        }
+
+        #root {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stlite-main {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editor-container">
+        <div id="editor"></div>
+        <button id="update-btn">Update Streamlit App</button>
+    </div>
+    <div id="root"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.73.0/build/stlite.js"></script>
+    <script>
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+        require(['vs/editor/editor.main'], function () {
+            const editor = monaco.editor.create(document.getElementById('editor'), {
+                value: `import streamlit as st\n\nst.markdown("This is an inline code format: \`code\`")`,
+                language: 'python',
+                theme: 'vs',
+                minimap: { enabled: false }
+            });
+
+            document.getElementById('update-btn').addEventListener('click', function () {
+                const code = editor.getValue();
+                stlite.mount(code, document.getElementById('root'));
+            });
+
+            // Initial mount
+            stlite.mount(editor.getValue(), document.getElementById('root'));
+        });
+    </script>
+</body>
+
+</html>
