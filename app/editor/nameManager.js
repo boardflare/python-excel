@@ -25,6 +25,7 @@ export async function updateNameManager(parsedCode) {
         if (namedItem.isNullObject) {
             // Create new name if it doesn't exist
             const newNamedItem = context.workbook.names.add(parsedCode.name, parsedCode.formula);
+            await context.sync();
             newNamedItem.visible = true;
             if (parsedCode.description) {
                 newNamedItem.comment = parsedCode.description;

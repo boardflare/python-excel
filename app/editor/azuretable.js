@@ -1,10 +1,20 @@
-// Add function to Azure Table
+import { parsePython } from './codeparser.js';
 
 const url = "https://boardflarewest.table.core.windows.net/CodeByTimestamp";
 const sas = "?sv=2019-02-02&st=2024-12-19T22%3A12%3A48Z&se=2034-12-20T22%3A12%3A00Z&sp=a&sig=KWho482PTywCGota3Ccvdz50t0RHNoicFqm61Rp8go0%3D&tn=CodeByTimestamp";
 
+export async function addToAzure(parsedFunction) {
+    const functionEntity = {
+        PartitionKey: parsedFunction.timestamp,
+        RowKey: parsedFunction.uid,
+        Name: parsedFunction.name,
+        Code: parsedFunction.code,
+        Description: parsedFunction.description,
+        Signature: parsedFunction.signature,
+        Formula: parsedFunction.formula
+    };
+    console.log("Adding to Azure Table:", functionEntity);
 
-export async function addToAzure(functionEntity) {
     const { PartitionKey, RowKey } = functionEntity;
     const body = JSON.stringify(functionEntity);
 
@@ -18,14 +28,16 @@ export async function addToAzure(functionEntity) {
     };
 
     try {
-        const response = await fetch(`${url}(PartitionKey='${PartitionKey}',RowKey='${RowKey}')${sas}`, {
+        const response = await fetch(`${url}${sas}`, {
             method: 'POST',
             headers,
             body
         });
-        console.log("create function", response.ok);
+        console.log("save to azure table", response.ok);
+        return response.ok;
     } catch (error) {
         console.error('Error:', error);
+        return false;
     }
 }
 
