@@ -11,14 +11,18 @@
 
 <body>
 		<gradio-lite layout="vertical" playground>
-		import gradio as gr
-
-		def greet(name):
-			return "Hello, " + name + "!"
-
-		gr.Interface(greet, "textbox", "textbox").launch()
+        <gradio-requirements>
+        transformers_js_py
+        </gradio-requirements>
+        from transformers_js import import_transformers_js
+        import gradio as gr
+        def add(a, b):
+	        return a + b
+        
+        demo = gr.Interface(fn=add, inputs=["number", "number"], outputs="number")
+        
+        demo.launch()
 		</gradio-lite>
-
 
     <div style="margin: 10px;">
         <button id="extractButton">Extract Code</button>
