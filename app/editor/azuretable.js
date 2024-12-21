@@ -11,7 +11,8 @@ export async function addToAzure(parsedFunction) {
         Code: parsedFunction.code,
         Description: parsedFunction.description,
         Signature: parsedFunction.signature,
-        Formula: parsedFunction.formula
+        Formula: parsedFunction.formula,
+        Demo: parsedFunction.demo || ''  // Add demo property
     };
     console.log("Adding to Azure Table:", functionEntity);
 

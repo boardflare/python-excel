@@ -51,8 +51,11 @@ export default {
 						'Content-Type': 'text/plain'
 					}
 				});
+			} else if (returnParam === 'json') {
+				return Response.json(entity, { headers: cacheHeaders });
 			}
 
+			// Default case - return full entity
 			return Response.json(entity, { headers: cacheHeaders });
 		} catch (error) {
 			const statusCode = error.statusCode ||

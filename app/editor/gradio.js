@@ -24,9 +24,14 @@ async function getRunpyFunctions() {
 
 async function fetchFunctionCode(url) {
     try {
-        const response = await fetch(url);
+        const jsonUrl = url.replace('return=code', 'return=json');
+        const response = await fetch(jsonUrl);
         if (!response.ok) throw new Error('Failed to fetch code');
-        return await response.text();
+        const data = await response.json();
+        // Remove result line and combine function code with demo code if available
+        console.log('Fetched function:', data);
+        const codeWithoutResult = data.Code.replace(/\n\s*result\s*=\s*.*$/m, '');
+        return codeWithoutResult + (data.Demo ? '\n\n# Demo code: This will NOT be used by RUNPY\n' + data.Demo : '');
     } catch (error) {
         console.error('Failed to fetch function code:', error);
         return null;
@@ -68,8 +73,6 @@ import textdistance
 def greet(name):
     test = textdistance.hamming('text', 'test')
     return "Hello, " + name + str(test) + "!"
-
-result = greet(arg1)
 
 # Demo code: This will NOT be used by RUNPY
 import gradio as gr
@@ -132,10 +135,12 @@ live=True,submit_btn=gr.Button("Submit", visible=False),clear_btn=gr.Button("Cle
             const code = extractGradioCode();
             if (!code) return;
 
+            // Save will automatically split the code and demo sections
             const parsedFunction = parsePython(code);
             const saveResult = await addToAzure(parsedFunction);
             if (saveResult) {
                 await updateNameManager(parsedFunction);
+                await initFunctionDropdown(); // Refresh dropdown after successful save
                 document.getElementById('saveNotification').innerHTML =
                     '<div class="alert alert-success">Function saved successfully!</div>';
             } else {
@@ -157,15 +162,19 @@ live=True,submit_btn=gr.Button("Submit", visible=False),clear_btn=gr.Button("Cle
         select.innerHTML = '<option value="">Select a function...</option>' +
             functions.map(f => `<option value="${f.url}">${f.name}</option>`).join('');
 
-        select.addEventListener('change', async (e) => {
-            const url = e.target.value;
-            if (url) {
-                const code = await fetchFunctionCode(url);
-                if (code) {
-                    insertCode(code);
+        // Keep existing change event listener if already set
+        if (!select.hasChangeListener) {
+            select.addEventListener('change', async (e) => {
+                const url = e.target.value;
+                if (url) {
+                    const code = await fetchFunctionCode(url);
+                    if (code) {
+                        insertCode(code);
+                    }
                 }
-            }
-        });
+            });
+            select.hasChangeListener = true;
+        }
     }
 
     // Initialize dropdown after Office.js is ready

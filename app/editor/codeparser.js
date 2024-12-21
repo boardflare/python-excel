@@ -4,9 +4,9 @@ export function parsePython(rawCode) {
     }
     console.log('Parsing code:', rawCode);
 
-    // Split code at the Demo comment line and take only the code above it
-    const demoCommentPattern = /^\s*#\s*Demo:.*$/m;
-    const [activeCode] = rawCode.split(demoCommentPattern);
+    // Split code at the Demo comment line, knowing there's only one
+    const demoCommentPattern = /^\s*#\s*Demo.*$/m;
+    const [activeCode, demoCode] = rawCode.split(demoCommentPattern);
     if (!activeCode) {
         throw new Error("No valid code found before Demo comment");
     }
@@ -53,7 +53,8 @@ export function parsePython(rawCode) {
         description,
         code,
         formula,
-        timestamp,  // Add timestamp
-        uid,        // Add uid
+        timestamp,
+        uid,
+        demo: demoCode ? demoCode.trim() : null
     };
 }
