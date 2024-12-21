@@ -4,12 +4,19 @@ export function parsePython(rawCode) {
     }
     console.log('Parsing code:', rawCode);
 
+    // Split code at the Demo comment line and take only the code above it
+    const demoCommentPattern = /^\s*#\s*Demo:.*$/m;
+    const [activeCode] = rawCode.split(demoCommentPattern);
+    if (!activeCode) {
+        throw new Error("No valid code found before Demo comment");
+    }
+
     // Generate unique identifiers
     const timestamp = new Date().toISOString();
     const uid = "ANON:" + crypto.randomUUID();
 
     // Improved function pattern to better handle whitespace
-    const functionMatch = rawCode.match(/def\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([\s\S]*?)\)\s*:/);
+    const functionMatch = activeCode.match(/def\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([\s\S]*?)\)\s*:/);
     if (!functionMatch) throw new Error("No function definition found");
 
     const name = functionMatch[1].toUpperCase();
@@ -17,7 +24,7 @@ export function parsePython(rawCode) {
     const args = params.split(',').filter(arg => arg.trim());
 
     // Extract docstring with consistent trimming
-    const docstringMatch = rawCode.match(/^\s*(?:'''|""")([^]*?)(?:'''|""")|^\s*["'](.+?)["']/m);
+    const docstringMatch = activeCode.match(/^\s*(?:'''|""")([^]*?)(?:'''|""")|^\s*["'](.+?)["']/m);
     const description = docstringMatch
         ? (docstringMatch[1] || docstringMatch[2]).trim().slice(0, 255)
         : 'No description available';
@@ -25,8 +32,7 @@ export function parsePython(rawCode) {
     // Generate result string
     const argList = args.map((_, index) => `arg${index + 1}`).join(', ');
     const resultLine = `\n\nresult = ${name.toLowerCase()}(${argList})`;
-    // Only append result line if it doesn't already exist
-    const code = rawCode.trim() + (rawCode.includes(resultLine) ? '' : resultLine);
+    const code = activeCode.trim() + resultLine;
 
     // Determine which runpy environment to use
     let runpyEnv = 'BOARDFLARE.RUNPY';
@@ -38,7 +44,7 @@ export function parsePython(rawCode) {
 
     // Create lambda formula with dynamic runpy environment and sheet references
     const signature = `${name}(${params})`;
-    const codeRef = `https://py.boardflare.com/?uid=${uid}&timestamp=${timestamp}&name=${name}&return=code`;
+    const codeRef = `"https://getcode.boardflare.workers.dev/?uid=${uid}&timestamp=${timestamp}&name=${name}&return=code"`;
     const formula = `=LAMBDA(${params}, ${runpyEnv}(${codeRef}, ${params}))`;
 
     return {

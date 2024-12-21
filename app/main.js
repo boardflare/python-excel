@@ -1,5 +1,6 @@
 import { abortController } from "./utils/common.js";
 import { createNewFunction } from "./editor/create.js";
+import { initGradioEditor } from './editor/gradio.js';
 
 window.appName = 'Python';
 
@@ -56,9 +57,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             location.reload();
         }, 500);
     });
-});
 
-// Add button handlers when Office is ready
-Office.onReady(() => {
-    document.getElementById("createNewFunction").onclick = createNewFunction;
+    // Initialize Gradio editor when document is ready
+    initGradioEditor();
 });

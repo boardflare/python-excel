@@ -45,7 +45,7 @@ export default {
 
 			const returnParam = url.searchParams.get('return');
 			if (returnParam === 'code') {
-				return new Response(entity.code, {
+				return new Response(entity.Code, {
 					headers: {
 						...cacheHeaders,
 						'Content-Type': 'text/plain'
