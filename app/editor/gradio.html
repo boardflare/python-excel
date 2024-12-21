@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Gradio Lite App</title>
+    <script type="module" crossorigin src="https://cdn.jsdelivr.net/npm/@gradio/lite/dist/lite.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@gradio/lite/dist/lite.css" />
+</head>
+
+<body>
+		<gradio-lite layout="vertical" playground>
+		import gradio as gr
+
+		def greet(name):
+			return "Hello, " + name + "!"
+
+		gr.Interface(greet, "textbox", "textbox").launch()
+		</gradio-lite>
+
+
+    <div style="margin: 10px;">
+        <button id="extractButton">Extract Code</button>
+        <textarea id="codeInput" rows="4" style="width: 100%; margin: 10px 0;" 
+            placeholder="Enter Python code to insert..."></textarea>
+        <button id="insertButton">Insert Code</button>
+    </div>
+    <script>
+        function extractGradioCode() {
+            const codeContent = document.querySelector('.cm-content');
+            if (codeContent) {
+                const codeLines = Array.from(codeContent.querySelectorAll('.cm-line'))
+                    .map(line => line.textContent)
+                    .join('\n');
+                
+                console.log('Extracted Python code:');
+                console.log(codeLines);
+                document.getElementById('codeInput').value = codeLines;
+            }
+        }
+
+        function insertCode() {
+            try {
+                const codeContent = document.querySelector('.cm-content');
+                if (codeContent) {
+                    const codeToInsert = document.getElementById('codeInput').value;
+                    
+                    // Clear existing lines
+                    const existingLines = codeContent.querySelectorAll('.cm-line');
+                    existingLines.forEach(line => line.textContent = '');
+                    
+                    // Insert new code line by line
+                    const lines = codeToInsert.split('\n');
+                    lines.forEach((line, index) => {
+                        if (index < existingLines.length) {
+                            existingLines[index].textContent = line;
+                        } else {
+                            const newLine = document.createElement('div');
+                            newLine.className = 'cm-line';
+                            newLine.textContent = line;
+                            codeContent.appendChild(newLine);
+                        }
+                    });
+
+                    console.log('Code inserted successfully');
+                }
+            } catch (error) {
+                console.error('Failed to insert code:', error);
+            }
+        }
+
+        document.getElementById('extractButton').addEventListener('click', extractGradioCode);
+        document.getElementById('insertButton').addEventListener('click', insertCode);
+    </script>
+</body>
+
+</html>

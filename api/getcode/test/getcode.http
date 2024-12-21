@@ -1,0 +1,11 @@
+### ANON local code retrieval
+GET http://localhost:8787/?uid=ANON:mycid&timestamp=mytimestamp HTTP/1.1
+
+### ANON remote code retrieval
+GET https://getcode.boardflare.workers.dev/?uid=ANON:mycid&timestamp=mytimestamp HTTP/1.1
+
+### Test Azure Table Read Access with Add SAS Token
+GET https://boardflarewest.table.core.windows.net/CodeByTimestamp(PartitionKey='mytimestamp',RowKey='ANON:mycid')?sv=2019-02-02&st=2024-12-19T22%3A12%3A48Z&se=2034-12-20T22%3A12%3A00Z&sp=a&sig=KWho482PTywCGota3Ccvdz50t0RHNoicFqm61Rp8go0%3D&tn=CodeByTimestamp HTTP/1.1
+Accept: application/json;odata=nometadata
+x-ms-date: {{$datetime "UTC"}}
+x-ms-version: 2024-05-04
