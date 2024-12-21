@@ -2,6 +2,37 @@ import { parsePython } from './codeparser.js';
 import { addToAzure } from './azuretable.js';
 import { updateNameManager } from './nameManager.js';
 
+async function getRunpyFunctions() {
+    try {
+        await Office.onReady();
+        return await Excel.run(async (context) => {
+            const names = context.workbook.names.load("items");
+            await context.sync();
+
+            return names.items
+                .filter(name => name.formula.includes("RUNPY"))
+                .map(name => ({
+                    name: name.name,
+                    url: name.formula.match(/https:\/\/getcode\.boardflare\.workers\.dev[^"']*/)?.[0] || ''
+                }));
+        });
+    } catch (error) {
+        console.error('Failed to get RUNPY functions:', error);
+        return [];
+    }
+}
+
+async function fetchFunctionCode(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to fetch code');
+        return await response.text();
+    } catch (error) {
+        console.error('Failed to fetch function code:', error);
+        return null;
+    }
+}
+
 export function initGradioEditor() {
     let currentCode = '';
 
@@ -30,13 +61,15 @@ export function initGradioEditor() {
 import micropip
 await micropip.install(['pandas', 'matplotlib', 'textdistance==4.6.3'])
 
-# Function code:
+# Function code: arg1, arg2, ... will be inserted by RUNPY
 import numpy
 import textdistance
 
 def greet(name):
     test = textdistance.hamming('text', 'test')
     return "Hello, " + name + str(test) + "!"
+
+result = greet(arg1)
 
 # Demo code: This will NOT be used by RUNPY
 import gradio as gr
@@ -68,19 +101,16 @@ live=True,submit_btn=gr.Button("Submit", visible=False),clear_btn=gr.Button("Cle
         }
     }
 
-    function insertCode() {
+    function insertCode(code) {
         try {
             const codeContent = document.querySelector('.cm-content');
             if (codeContent) {
-                const codeToInsert = extractGradioCode();
-                if (!codeToInsert) return;
-
                 // Clear existing lines
                 const existingLines = codeContent.querySelectorAll('.cm-line');
                 existingLines.forEach(line => line.textContent = '');
 
                 // Insert new code line by line
-                const lines = codeToInsert.split('\n');
+                const lines = code.split('\n');
                 lines.forEach((line, index) => {
                     if (index < existingLines.length) {
                         existingLines[index].textContent = line;
@@ -119,7 +149,31 @@ live=True,submit_btn=gr.Button("Submit", visible=False),clear_btn=gr.Button("Cle
         }
     }
 
+    // Initialize function dropdown
+    async function initFunctionDropdown() {
+        const select = document.getElementById('functionSelect');
+        const functions = await getRunpyFunctions();
+
+        select.innerHTML = '<option value="">Select a function...</option>' +
+            functions.map(f => `<option value="${f.url}">${f.name}</option>`).join('');
+
+        select.addEventListener('change', async (e) => {
+            const url = e.target.value;
+            if (url) {
+                const code = await fetchFunctionCode(url);
+                if (code) {
+                    insertCode(code);
+                }
+            }
+        });
+    }
+
+    // Initialize dropdown after Office.js is ready
+    Office.onReady(() => {
+        initFunctionDropdown();
+    });
+
     document.getElementById('extractButton')?.addEventListener('click', extractGradioCode);
-    document.getElementById('insertButton')?.addEventListener('click', insertCode);
+    document.getElementById('insertButton')?.addEventListener('click', () => insertCode(extractGradioCode()));
     document.getElementById('saveButton')?.addEventListener('click', saveGradioCode);
 }
