@@ -60,4 +60,18 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Initialize Gradio editor when document is ready
     initGradioEditor();
+
+    // Reload button
+    document.getElementById('reloadButton').addEventListener('click', function () {
+        // Existing reload logic...
+
+        // Show notification
+        const notification = document.getElementById('reloadNotification');
+        notification.classList.remove('d-none');
+
+        // Hide after 5 seconds
+        setTimeout(() => {
+            notification.classList.add('d-none');
+        }, 5000);
+    });
 });

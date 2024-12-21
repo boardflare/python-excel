@@ -3,6 +3,61 @@ import { addToAzure } from './azuretable.js';
 import { updateNameManager } from './nameManager.js';
 
 export function initGradioEditor() {
+    let currentCode = '';
+
+    function createGradioComponent() {
+        const container = document.getElementById('gradioContainer');
+        if (!container) return;
+
+        // Save current code if editor exists
+        const existingCode = extractGradioCode();
+        if (existingCode) {
+            currentCode = existingCode;
+        }
+
+        // Clear container
+        container.innerHTML = '';
+
+        const gradioLite = document.createElement('gradio-lite');
+        gradioLite.setAttribute('layout', 'vertical');
+        gradioLite.setAttribute('playground', '');
+
+        const requirements = document.createElement('gradio-requirements');
+        const requirementsText = document.getElementById('requirementsText');
+        requirements.textContent = requirementsText?.value || 'transformers_js_py';
+
+        const defaultCode = currentCode || `# Install requirements:
+import micropip
+await micropip.install(['pandas', 'matplotlib', 'textdistance==4.6.3'])
+
+# Function code:
+import numpy
+import textdistance
+
+def greet(name):
+    test = textdistance.hamming('text', 'test')
+    return "Hello, " + name + str(test) + "!"
+
+# Demo code: This will NOT be used by RUNPY
+import gradio as gr
+gr.Interface(greet, "textbox", "textbox", examples=[["Bob"], ["Sally"]],
+live=True,submit_btn=gr.Button("Submit", visible=False),clear_btn=gr.Button("Clear", visible=False),flagging_mode="never").launch()`;
+
+        gradioLite.appendChild(requirements);
+        gradioLite.appendChild(document.createTextNode(defaultCode));
+
+        container.appendChild(gradioLite);
+    }
+
+    // Initialize requirements textarea with default values
+    document.getElementById('requirementsText').value = 'transformers_js_py';
+
+    // Create Gradio component on init
+    createGradioComponent();
+
+    // Add reload button handler
+    document.getElementById('reloadButton').addEventListener('click', createGradioComponent);
+
     function extractGradioCode() {
         const codeContent = document.querySelector('.cm-content');
         if (codeContent) {
