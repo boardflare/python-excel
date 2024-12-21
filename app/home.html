@@ -27,10 +27,6 @@
                     role="tab">Home</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="requirements-tab" data-bs-toggle="tab" data-bs-target="#requirements" type="button"
-                    role="tab">Requirements</button>
-            </li>
-            <li class="nav-item" role="presentation">
                 <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code" type="button"
                     role="tab">Code Editor</button>
             </li>
@@ -55,24 +51,6 @@
                             <button id="cancelButton" class="btn btn-sm btn-secondary mb-2">Cancel</button>
                             <div id="progress"></div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="requirements" role="tabpanel">
-                <div class="py-3">
-                    <div class="alert alert-info">
-                        <p class="mb-0">Specify Python packages required by your code. Each line should contain a package name, 
-                        optionally followed by version constraints (e.g., "numpy>=1.20.0"). These packages will be installed 
-                        in the Python environment used by the editor.</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="requirementsText">Python Package Requirements</label>
-                        <textarea class="form-control" id="requirementsText" rows="10"></textarea>
-                    </div>
-                    <div class="mt-3">
-                        <button id="reloadButton" class="btn btn-primary">Reload Editor</button>
-                        <div id="reloadNotification" class="alert alert-success mt-2 d-none">Editor reloaded successfully!</div>
                     </div>
                 </div>
             </div>

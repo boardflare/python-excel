@@ -58,10 +58,6 @@ export function initGradioEditor() {
         gradioLite.setAttribute('layout', 'vertical');
         gradioLite.setAttribute('playground', '');
 
-        const requirements = document.createElement('gradio-requirements');
-        const requirementsText = document.getElementById('requirementsText');
-        requirements.textContent = requirementsText?.value || 'transformers_js_py';
-
         const defaultCode = currentCode || `# Install requirements:
 import micropip
 await micropip.install(['pandas', 'matplotlib', 'textdistance==4.6.3'])
@@ -79,20 +75,12 @@ import gradio as gr
 gr.Interface(greet, "textbox", "textbox", examples=[["Bob"], ["Sally"]],
 live=True,submit_btn=gr.Button("Submit", visible=False),clear_btn=gr.Button("Clear", visible=False),flagging_mode="never").launch()`;
 
-        gradioLite.appendChild(requirements);
         gradioLite.appendChild(document.createTextNode(defaultCode));
-
         container.appendChild(gradioLite);
     }
 
-    // Initialize requirements textarea with default values
-    document.getElementById('requirementsText').value = 'transformers_js_py';
-
     // Create Gradio component on init
     createGradioComponent();
-
-    // Add reload button handler
-    document.getElementById('reloadButton').addEventListener('click', createGradioComponent);
 
     function extractGradioCode() {
         const codeContent = document.querySelector('.cm-content');
@@ -182,7 +170,6 @@ live=True,submit_btn=gr.Button("Submit", visible=False),clear_btn=gr.Button("Cle
         initFunctionDropdown();
     });
 
-    document.getElementById('extractButton')?.addEventListener('click', extractGradioCode);
-    document.getElementById('insertButton')?.addEventListener('click', () => insertCode(extractGradioCode()));
+    // Only keep the save button handler that exists in HTML
     document.getElementById('saveButton')?.addEventListener('click', saveGradioCode);
 }

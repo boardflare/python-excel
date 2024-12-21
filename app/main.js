@@ -1,12 +1,11 @@
 import { abortController } from "./utils/common.js";
-import { createNewFunction } from "./editor/create.js";
 import { initGradioEditor } from './editor/gradio.js';
 
 window.appName = 'Python';
 
 // Google Analytics config
 window.appConfig = {
-    app_version: "1.0.7",
+    app_version: "1.1.0",
     content_group: window.appName,
     content_type: "Excel",
 };
@@ -60,18 +59,4 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Initialize Gradio editor when document is ready
     initGradioEditor();
-
-    // Reload button
-    document.getElementById('reloadButton').addEventListener('click', function () {
-        // Existing reload logic...
-
-        // Show notification
-        const notification = document.getElementById('reloadNotification');
-        notification.classList.remove('d-none');
-
-        // Hide after 5 seconds
-        setTimeout(() => {
-            notification.classList.add('d-none');
-        }, 5000);
-    });
 });
