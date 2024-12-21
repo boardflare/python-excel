@@ -1,5 +1,5 @@
-import { queueTask } from '../utils/common.js';
-import { runPy } from '../runpy/controller.js';
+import { queueTask } from '../../utils/common.js';
+import { runPy } from '../../runpy/controller.js';
 
 let progressDiv;
 

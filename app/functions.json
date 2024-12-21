@@ -25,30 +25,6 @@
             "result": {
                 "dimensionality": "matrix"
             }
-        },
-        {
-            "id": "CODEPY",
-            "name": "CODEPY",
-            "description": "Creates custom Excel functions using Python.",
-            "helpUrl": "https://www.boardflare.com/apps/excel/python#codepy",
-            "parameters": [
-                {
-                    "name": "prompt",
-                    "description": "Prompt for LLM model to write code.",
-                    "type": "string"
-                },
-                {
-                    "name": "arg1",
-                    "description": "Example arguments.",
-                    "optional": true,
-                    "dimensionality": "matrix",
-                    "repeating": true,
-                    "type": "any"
-                }
-            ],
-            "result": {
-                "dimensionality": "matrix"
-            }
         }
     ]
 }

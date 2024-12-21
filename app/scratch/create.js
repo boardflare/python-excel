@@ -1,7 +1,7 @@
-import { parsePython } from './codeparser.js';
-import { updateNameManager } from './nameManager.js';
+import { parsePython } from '../editor/codeparser.js';
+import { updateNameManager } from '../editor/nameManager.js';
 import { addDemo } from './demo.js';
-import { saveFunction, getFunctionNames, getFunctionCode } from './functions.js';
+import { saveFunction, getFunctionNames, getFunctionCode } from '../editor/functions.js';
 
 const progress = document.getElementById('progress');
 
